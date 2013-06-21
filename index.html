@@ -54,6 +54,10 @@
 					<h1>Panel1</h1>
 				</div>  
 				<div class="row">
+					<form method="POST" action="./update">
+						<input type="text" name="user_name" />
+						<input type="submit" />
+					</form>
 				</div>
 			</div>
 
@@ -65,6 +69,11 @@
 					<h1>Panel2</h1>
 				</div>
 				<div class="row">
+					<ul>
+					{% for p in participants %}
+					<li>{{p.name}}</li>
+					{% endfor %}
+					</ul>
 				</div>
 			</div>
 		</div>
