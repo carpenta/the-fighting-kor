@@ -9,6 +9,7 @@ from google.appengine.ext import ndb
 
 import webapp2
 import jinja2
+import json
 
 JINJA_ENVIRONMENT = jinja2.Environment(
 loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
@@ -45,7 +46,7 @@ class MainPage(webapp2.RequestHandler):
 		else:
 			self.redirect(users.create_login_url(self.request.uri))
 
-class Schedule(webapp2.RequestHandler):
+class Process(webapp2.RequestHandler):
 	def get(self):
 		self.response.write("test");
 	def post(self): 
@@ -61,9 +62,23 @@ class Schedule(webapp2.RequestHandler):
 		else:
 			self.response.write("fail")
 
+class JsonPage(webapp2.RequestHandler):
+	def get(self):
+		data_set = []
+		for p in Participant.query().fetch():
+			data_map = p.to_dict()
+			data_map['operator'] = p.operator.user_id() + ", " + p.operator.nickname()
+			data_map['date'] = p.date.isoformat()
+			data_set.append(data_map)
+
+		self.response.write(json.dumps(data_set))
+
+		#self.response.write(json.dumps([p.name for p in Participant.query().fetch()]))
+
 application = webapp2.WSGIApplication([
     ('/', MainPage),
-    ('/update', Schedule)
+    ('/update', Process),
+		('/json', JsonPage)
 ], debug=True)
 
 
