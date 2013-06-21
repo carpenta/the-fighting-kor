@@ -15,17 +15,22 @@ loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
 extensions=['jinja2.ext.autoescape'])
 
 # Models
-class JejuPlace(ndb.Model):
-    title = ndb.StringProperty(indexed=False)
-    place = ndb.StringProperty(indexed=False)
-    date = ndb.DateTimeProperty(auto_now_add=True)
+class Participant(ndb.Model):
+  image = ndb.StringProperty(indexed=False)
+  name = ndb.StringProperty(indexed=False)
+	association = ndb.StringProperty(indexed=False)
+	emblem = ndb.StringProperty(indexed=False)
+	date = ndb.DateTimeProperty(auto_now_add=True)
 
-class UserCheckedSchedule(ndb.Model):
-    userId = ndb.StringProperty()
-    author = ndb.UserProperty()
-    checkedDateJson = ndb.StringProperty(indexed=False)
-    checkedPlaceJson = ndb.StringProperty(indexed=False)
-    
+class FightMatch(ndb.Model):
+	section_num = ndb.StringProperty()
+	match_num = ndb.StringProperty()
+  participant1 = ndb.ReferenceProperty(Participant)  
+	participant2 = ndb.ReferenceProperty(Participant)
+	score = ndb.StringProperty()
+	checklist = ndb.StringListProperty()
+	winner = ndb.ReferenceProperty(Participant)
+	result = ndb.StringProperty()
 
 class MainPage(webapp2.RequestHandler):
     def get(self):
@@ -38,6 +43,9 @@ class MainPage(webapp2.RequestHandler):
             self.redirect(users.create_login_url(self.request.uri))
 
 class Schedule(webapp2.RequestHandler):
+		def get(self):
+			self.response.write("test");
+
     def post(self):
         if users.get_current_user():
             checkedScheduleJson = self.request.get('schedule', '')
