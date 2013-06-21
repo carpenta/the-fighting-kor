@@ -40,7 +40,10 @@ class MainPage(webapp2.RequestHandler):
 	def get(self):
 		if users.get_current_user():
 			url = users.create_logout_url(self.request.uri)
-			template_values = {'participants' : Participant.query()}
+			template_values = {
+				'participants' : Participant.query(),
+				'fitghtmatches' : FightMatch.query()
+			}
 			template = JINJA_ENVIRONMENT.get_template('index.html') 
 			self.response.write(template.render(template_values))
 		else:
@@ -48,7 +51,7 @@ class MainPage(webapp2.RequestHandler):
 
 class Process(webapp2.RequestHandler):
 	def get(self):
-		self.response.write("test");
+		self.response.write("test")
 	def post(self): 
 		if users.get_current_user():	
 			participant = Participant()
@@ -58,6 +61,19 @@ class Process(webapp2.RequestHandler):
 			participant.association = "test"
 			participant.emblem = "not yet"
 			participant.put()
+			self.response.write("<a href='/'>success</a>")
+		else:
+			self.response.write("fail")
+
+class Ground(webapp2.RequestHandler):
+	def get(self):
+		self.response.write("test")
+	def post(self):
+		if users.get_current_user():
+			fightmatch = FightMatch()
+			fightmatch.section_num = self.request.get('section')
+			fightmatch.match_num = self.request.get('match')
+			fightmatch.put()
 			self.response.write("<a href='/'>success</a>")
 		else:
 			self.response.write("fail")
@@ -78,6 +94,7 @@ class JsonPage(webapp2.RequestHandler):
 application = webapp2.WSGIApplication([
     ('/', MainPage),
     ('/update', Process),
+		('/ground', Ground),
 		('/json', JsonPage)
 ], debug=True)
 
