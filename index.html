@@ -33,19 +33,20 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a class="brand" href="#">The Fighting Korea</a>
+        <a class="brand" href="./">The Fighting Korea</a>
         <div class="nav-collapse collapse">
-          <ul class="nav">
-              <li class="active"><a href="#">Home</a></li>
-              <li><a href="#about">선수관리</a></li>
-              <li><a href="#contact">경기관리</a></li>
-          </ul>
+				{% include "menu.html" %}
         </div><!--/.nav-collapse -->
       </div>
     </div>
   </div>
 
   <div class="container" id="body_content">
+	{% if menu_context == "player" %}
+		{% include "player.html" %}
+	{% elif menu_context == "ground" %}
+		{% include "ground.html" %}
+	{% else %}
 		<div class="row">
 			<div class="span6">
 				<div class="row">
@@ -100,6 +101,7 @@
 				</div>
 			</div>
 		</div>
+	{% endif %}
 	</div>
 
   <div id="footer">

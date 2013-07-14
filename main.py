@@ -15,6 +15,7 @@ JINJA_ENVIRONMENT = jinja2.Environment(
 loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
 extensions=['jinja2.ext.autoescape'])
 
+
 # Models
 class Participant(ndb.Model):
 	image = ndb.StringProperty()
@@ -42,7 +43,8 @@ class MainPage(webapp2.RequestHandler):
 			url = users.create_logout_url(self.request.uri)
 			template_values = {
 				'participants' : Participant.query(),
-				'fitghtmatches' : FightMatch.query()
+				'fitghtmatches' : FightMatch.query(),
+				'menu_context' : self.request.get("menu")
 			}
 			template = JINJA_ENVIRONMENT.get_template('index.html') 
 			self.response.write(template.render(template_values))
