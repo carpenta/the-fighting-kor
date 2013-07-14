@@ -37,6 +37,13 @@ class FightMatch(ndb.Model):
 	operator = ndb.UserProperty()
 	date = ndb.DateTimeProperty(auto_now_add=True)
 
+class Tournament(ndb.Model):
+	tournament_num = ndb.StringProperty()
+  participant1 = ndb.KeyProperty(kind=Participant)
+  participant2 = ndb.KeyProperty(kind=Participant)
+	status = ndb.StringProperty()
+  winner = ndb.KeyProperty(kind=Participant)
+
 class MainPage(webapp2.RequestHandler):
 	def get(self):
 		if users.get_current_user():
@@ -69,6 +76,8 @@ class Process(webapp2.RequestHandler):
 
 class Ground(webapp2.RequestHandler):
 	def get(self):
+		ground_num = self.request.get("gid")
+		
 		self.response.write("test")
 	def post(self):
 		if users.get_current_user():
@@ -79,6 +88,11 @@ class Ground(webapp2.RequestHandler):
 			self.response.write("<a href='/'>success</a>")
 		else:
 			self.response.write("fail")
+
+class Tournament(webapp2.RequestHandler):
+	def get(self):
+		ground_num = self.request.get("ground")
+		
 
 class JsonPage(webapp2.RequestHandler):
 	def get(self):
@@ -97,6 +111,7 @@ application = webapp2.WSGIApplication([
     ('/', MainPage),
     ('/update', Process),
 		('/ground', Ground),
+		('/tournaments', Tournament),
 		('/json', JsonPage)
 ], debug=True)
 
