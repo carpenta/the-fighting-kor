@@ -16,6 +16,11 @@ loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
 extensions=['jinja2.ext.autoescape'])
 
 
+def dictWithKey(model):
+	result = model.to_dict()
+	result['id'] = model.key.urlsafe()
+	return result
+
 # Models
 class Participant(ndb.Model):
 	name = ndb.StringProperty()
@@ -38,7 +43,7 @@ class MainPage(webapp2.RequestHandler):
 			url = users.create_logout_url(self.request.uri)
 			template_values = {
 				'participants' : Participant.query(),
-				'tournament' : Tournament.query(),
+				'tournaments' : Tournament.query(),
 				'menu_context' : self.request.get("menu")
 			}
 			template = JINJA_ENVIRONMENT.get_template('index.html') 
@@ -79,33 +84,33 @@ class Ground(webapp2.RequestHandler):
 class TournamentPage(webapp2.RequestHandler):
 	def get(self):
 		ground_num = self.request.get("ground")
-		data = Tournament.query().fetch()
-		self.response.write(json.dumps(data))	
+		tournaments = []
+		for t in Tournament.query().fetch():
+			tournaments.append(dictWithKey(t))
+
+		self.response.write(json.dumps(tournaments))	
+		
 	def post(self):
 		tournament = Tournament()
 		tournament.tournament_num = self.request.get('tournament_num', 'error')
 		tournament.status = "running" #self.reqeust.get('status')
-		tournament.participant1 = Participant.query(self.request.get('p1_id')).get()
-		tournament.participant2 = Participant.query(self.request.get('p2_id')).get()
+		tournament.participant1 = ndb.Key(urlsafe=self.request.get('p1_id'))
+		tournament.participant2 = ndb.Key(urlsafe=self.request.get('p2_id'))
 		#tournament.winner = Participant.query(self.request.get('winner_id')).get()
 		tournament.put()
-		self.response.write("<a href='/'>success</a>")
+		self.response.write("<a href='/?menu=ground'>success</a>")
 
 class JsonPage(webapp2.RequestHandler):
-	def modelToJson(self, participant):
-		result = participant.to_dict()
-		result['id'] = participant.key.urlsafe()
-		return result
-
 	def get(self):
 		if self.request.get("key") :
 			req_key = self.request.get("key")
-			self.response.write(json.dumps(self.modelToJson(ndb.Key(urlsafe=req_key).get())))
+			self.response.write(json.dumps(dictWithKey(ndb.Key(urlsafe=req_key).get())))
 			return
 
 		participants = []
 		for p in Participant.query().fetch():
-			participants.append(self.modelToJson(p))
+			participants.append(dictWithKey(p))
+
 		self.response.write(json.dumps(participants))
 		#self.response.write(json.dumps([p.name for p in Participant.query().fetch()]))
 
