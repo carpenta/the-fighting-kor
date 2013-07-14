@@ -86,7 +86,10 @@ class TournamentPage(webapp2.RequestHandler):
 		ground_num = self.request.get("ground")
 		tournaments = []
 		for t in Tournament.query().fetch():
-			tournaments.append(dictWithKey(t))
+			tournament = dictWithKey(t)
+			tournament['participant1'] = dictWithKey(t.participant1.get())
+			tournament['participant2'] = dictWithKey(t.participant2.get())
+			tournaments.append(tournament)
 
 		self.response.write(json.dumps(tournaments))	
 		
