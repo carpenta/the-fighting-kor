@@ -18,12 +18,12 @@ extensions=['jinja2.ext.autoescape'])
 
 # Models
 class Participant(ndb.Model):
-	image = ndb.StringProperty()
 	name = ndb.StringProperty()
 	association = ndb.StringProperty()
-	emblem = ndb.StringProperty()
-	operator = ndb.UserProperty()
-	date = ndb.DateTimeProperty(auto_now_add=True)
+	weight = ndb.StringProperty()
+	grade = ndb.StringProperty()
+	#operator = ndb.UserProperty()
+	#date = ndb.DateTimeProperty(auto_now_add=True)
 
 class FightMatch(ndb.Model):
 	section_num = ndb.StringProperty()
@@ -58,19 +58,18 @@ class MainPage(webapp2.RequestHandler):
 		else:
 			self.redirect(users.create_login_url(self.request.uri))
 
-class Process(webapp2.RequestHandler):
+class PlayerPage(webapp2.RequestHandler):
 	def get(self):
 		self.response.write("test")
 	def post(self): 
 		if users.get_current_user():	
 			participant = Participant()
-			participant.operator = users.get_current_user()
 			participant.name = self.request.get('user_name', 'unknown')
-			participant.image = "not yet"
-			participant.association = "test"
-			participant.emblem = "not yet"
+			participant.association = self.request.get('user_assoc', 'unknown')
+			participant.weight = self.request.get('user_weight', 'unknown')
+			participant.grade = self.request.get('user_grade', 'infinite')
 			participant.put()
-			self.response.write("<a href='/'>success</a>")
+			self.response.write("<a href='/?menu=player'>success</a>")
 		else:
 			self.response.write("fail")
 
@@ -85,22 +84,32 @@ class Ground(webapp2.RequestHandler):
 			fightmatch.section_num = self.request.get('section')
 			fightmatch.match_num = self.request.get('match')
 			fightmatch.put()
-			self.response.write("<a href='/'>success</a>")
+			self.response.write("<a href='/?menu=ground'>success</a>")
 		else:
 			self.response.write("fail")
 
-class Tournament(webapp2.RequestHandler):
+class TournamentPage(webapp2.RequestHandler):
 	def get(self):
 		ground_num = self.request.get("ground")
-		
+		data = Tournament.query().fetch()
+		self.response.write(json.dumps(data))	
+	def post(self):
+		tournament = Tournament()
+		tournament.tournament_num = self.request.get('tournament_num')
+		tournament.status = self.reqeust.get('status')
+		tournament.participant1 = Participant.query(self.request.get('p1_id')).get()
+		tournament.participant2 = Participant.query(self.request.get('p2_id')).get()
+		tournament.winner = Participant.query(self.request.get('winner_id')).get()
+		tournament.put()
+		self.response.write("<a href='/'>success</a>")
 
 class JsonPage(webapp2.RequestHandler):
 	def get(self):
 		data_set = []
 		for p in Participant.query().fetch():
 			data_map = p.to_dict()
-			data_map['operator'] = p.operator.user_id() + ", " + p.operator.nickname()
-			data_map['date'] = p.date.isoformat()
+			#data_map['operator'] = p.operator.user_id() + ", " + p.operator.nickname()
+			#data_map['date'] = p.date.isoformat()
 			data_set.append(data_map)
 
 		self.response.write(json.dumps(data_set))
@@ -109,9 +118,9 @@ class JsonPage(webapp2.RequestHandler):
 
 application = webapp2.WSGIApplication([
 	('/', MainPage),
-	('/update', Process),
+	('/player', PlayerPage),
 	('/ground', Ground),
-	('/tournaments', Tournament),
+	('/tournaments', TournamentPage),
 	('/json', JsonPage)
 ], debug=True)
 

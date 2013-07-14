@@ -4,7 +4,7 @@
 			<h1>참가자 생성</h1>
 		</div>  
 		<div class="row">
-			<form method="POST" action="./update">
+			<form method="POST" action="./player">
 				<p> 선수 이름 : <input type="text" name="user_name" /> </p>
 				<p> 선수 소속 : <input type="text" name="user_assoc" /> </p>
 				<p> 선수 체급 : <input type="text" name="user_weight" /> </p>
@@ -20,11 +20,28 @@
 			<h1>참가자목록</h1>
 		</div>
 		<div class="row">
-			<ul>
-			{% for p in participants %}
-			<li>{{p.name}}</li>
-			{% endfor %}
-			</ul>
+			<table class='table table-striped'>
+				<thead>
+					<tr>
+						<th>선수 이름</th>
+						<th>선수 소속</th>
+						<th>선수 체급</th>
+						<th>선수 단수</th>
+						<th>...</th>
+					</tr>
+				</thead>
+				<tbody>
+				{% for p in participants %}
+				<tr>
+					<td>{{p.name}}</td>
+					<td>{{p.association}}</td>
+					<td>{{p.weight}}</td>
+					<td>{{p.grade}}</td>
+					<td><button class='btn btn-danger'>Del</button></td>
+				</tr>
+				{% endfor %}
+				</tbody>
+			</table>
 		</div>
 	</div>
 </div>
