@@ -39,10 +39,10 @@ class FightMatch(ndb.Model):
 
 class Tournament(ndb.Model):
 	tournament_num = ndb.StringProperty()
-  participant1 = ndb.KeyProperty(kind=Participant)
-  participant2 = ndb.KeyProperty(kind=Participant)
+	participant1 = ndb.KeyProperty(kind=Participant)
+	participant2 = ndb.KeyProperty(kind=Participant)
 	status = ndb.StringProperty()
-  winner = ndb.KeyProperty(kind=Participant)
+	winner = ndb.KeyProperty(kind=Participant)
 
 class MainPage(webapp2.RequestHandler):
 	def get(self):
@@ -108,11 +108,11 @@ class JsonPage(webapp2.RequestHandler):
 		#self.response.write(json.dumps([p.name for p in Participant.query().fetch()]))
 
 application = webapp2.WSGIApplication([
-    ('/', MainPage),
-    ('/update', Process),
-		('/ground', Ground),
-		('/tournaments', Tournament),
-		('/json', JsonPage)
+	('/', MainPage),
+	('/update', Process),
+	('/ground', Ground),
+	('/tournaments', Tournament),
+	('/json', JsonPage)
 ], debug=True)
 
 
