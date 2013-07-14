@@ -47,60 +47,7 @@
 	{% elif menu_context == "ground" %}
 		{% include "ground.html" %}
 	{% else %}
-		<div class="row">
-			<div class="span6">
-				<div class="row">
-					<h1>참가자 생성</h1>
-				</div>  
-				<div class="row">
-					<form method="POST" action="./update">
-						<input type="text" name="user_name" />
-						<input type="submit" />
-					</form>
-				</div>
-			</div>
-
-			<div class="span6">
-				<div class="row">
-					<h1>참가자목록</h1>
-				</div>
-				<div class="row">
-					<ul>
-					{% for p in participants %}
-					<li>{{p.name}}</li>
-					{% endfor %}
-					</ul>
-				</div>
-			</div>
-		</div>
-
-
-		<div class="row" style="margin-top:30px">
-			<div class="span6">
-				<div class="row">
-					<h1>경기 생성</h1>
-				</div>
-				<div class="row">
-					<form method="POST" action="./ground">
-						<input type="text" name="section" class="input-small" />조
-						<input type="text" name="match" class="input-small" />번호
-						<input type="submit" />
-					</form>
-				</div>
-			</div>
-			<div class="span6">
-				<div class="row">
-					<h1>경기 목록</h1>
-				</div>
-				<div class="row">
-					<ul>
-					{% for m in fitghtmatches %}
-					<li>{{m.section_num}} - {{m.match_num}}</li>
-					{% endfor %}
-					</ul>
-				</div>
-			</div>
-		</div>
+		{% include "default.html" %}
 	{% endif %}
 	</div>
 
