@@ -25,18 +25,6 @@ class Participant(ndb.Model):
 	#operator = ndb.UserProperty()
 	#date = ndb.DateTimeProperty(auto_now_add=True)
 
-class FightMatch(ndb.Model):
-	section_num = ndb.StringProperty()
-	match_num = ndb.StringProperty()
-	participant1 = ndb.KeyProperty(kind=Participant)  
-	participant2 = ndb.KeyProperty(kind=Participant)
-	score = ndb.StringProperty()
-	checklist = ndb.StringProperty(repeated=True)
-	winner = ndb.KeyProperty(kind=Participant)
-	result = ndb.StringProperty()
-	operator = ndb.UserProperty()
-	date = ndb.DateTimeProperty(auto_now_add=True)
-
 class Tournament(ndb.Model):
 	tournament_num = ndb.StringProperty()
 	participant1 = ndb.KeyProperty(kind=Participant)
@@ -50,7 +38,7 @@ class MainPage(webapp2.RequestHandler):
 			url = users.create_logout_url(self.request.uri)
 			template_values = {
 				'participants' : Participant.query(),
-				'fitghtmatches' : FightMatch.query(),
+				'tournament' : Tournament.query(),
 				'menu_context' : self.request.get("menu")
 			}
 			template = JINJA_ENVIRONMENT.get_template('index.html') 
@@ -95,21 +83,29 @@ class TournamentPage(webapp2.RequestHandler):
 		self.response.write(json.dumps(data))	
 	def post(self):
 		tournament = Tournament()
-		tournament.tournament_num = self.request.get('tournament_num')
-		tournament.status = self.reqeust.get('status')
+		tournament.tournament_num = self.request.get('tournament_num', 'error')
+		tournament.status = "running" #self.reqeust.get('status')
 		tournament.participant1 = Participant.query(self.request.get('p1_id')).get()
 		tournament.participant2 = Participant.query(self.request.get('p2_id')).get()
-		tournament.winner = Participant.query(self.request.get('winner_id')).get()
+		#tournament.winner = Participant.query(self.request.get('winner_id')).get()
 		tournament.put()
 		self.response.write("<a href='/'>success</a>")
 
 class JsonPage(webapp2.RequestHandler):
+	def modelToJson(self, participant):
+		result = participant.to_dict()
+		result['id'] = participant.key.urlsafe()
+		return result
+
 	def get(self):
+		if self.request.get("key") :
+			req_key = self.request.get("key")
+			self.response.write(json.dumps(self.modelToJson(ndb.Key(urlsafe=req_key).get())))
+			return
+
 		participants = []
 		for p in Participant.query().fetch():
-			participant = p.to_dict()
-			participant['id'] = p.key.id()
-			participants.append(participant)
+			participants.append(self.modelToJson(p))
 		self.response.write(json.dumps(participants))
 		#self.response.write(json.dumps([p.name for p in Participant.query().fetch()]))
 
