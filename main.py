@@ -105,15 +105,12 @@ class TournamentPage(webapp2.RequestHandler):
 
 class JsonPage(webapp2.RequestHandler):
 	def get(self):
-		data_set = []
+		participants = []
 		for p in Participant.query().fetch():
-			data_map = p.to_dict()
-			#data_map['operator'] = p.operator.user_id() + ", " + p.operator.nickname()
-			#data_map['date'] = p.date.isoformat()
-			data_set.append(data_map)
-
-		self.response.write(json.dumps(data_set))
-
+			participant = p.to_dict()
+			participant['id'] = p.key.id()
+			participants.append(participant)
+		self.response.write(json.dumps(participants))
 		#self.response.write(json.dumps([p.name for p in Participant.query().fetch()]))
 
 application = webapp2.WSGIApplication([
