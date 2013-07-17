@@ -1,0 +1,193 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <style>
+      body {
+        margin: 0px;
+        padding: 0px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container"></div>
+    <script src="http://d3lp1msu2r81bx.cloudfront.net/kjs/js/lib/kinetic-v4.5.4.min.js"></script>
+    <script defer="defer">
+      var dropZones = [];
+
+      var stage = new Kinetic.Stage({
+        container: 'container',
+        width: 1000,
+        height: 800
+      });
+
+      var shapesLayer = new Kinetic.Layer();
+      var fieldLayer = new Kinetic.Layer();
+      
+      // group.on('mouseover', function() {
+      //   document.body.style.cursor = 'pointer';
+      // });
+      // group.on('mouseout', function() {
+      //   document.body.style.cursor = 'default';
+      // });      
+      fieldLayer.add(makeDropZone({x:20, y:500, width:100, height:100}, {id:100, text:"zone1"}));
+      fieldLayer.add(makeDropZone({x:170, y:500, width:100, height:100}, {id:100, text:"zone2"}));
+      fieldLayer.add(makeDropZone({x:320, y:500, width:100, height:100}, {id:100, text:"zone3"}));
+      fieldLayer.add(makeDropZone({x:470, y:500, width:100, height:100}, {id:100, text:"zone4"}));
+      stage.add(fieldLayer);
+      dropZones = fieldLayer.getChildren().toArray();
+
+      shapesLayer.add(makeBox({x:700, y:20, width:100}, {id:1, text:"p1, p2"}));
+      shapesLayer.add(makeBox({x:700, y:120, width:100}, {id:2, text:"p3, p4"}));
+      shapesLayer.add(makeBox({x:700, y:220, width:100}, {id:3, text:"p5, p6"}));
+      shapesLayer.add(makeBox({x:700, y:320, width:100}, {id:4, text:"p7, p8"}));
+      stage.add(shapesLayer);
+
+
+
+
+      function generateUUID(){
+        var d = new Date().getTime();
+        var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+          var r = (d + Math.random()*16)%16 | 0;
+          d = Math.floor(d/16);
+          return (c=='x' ? r : (r&0x7|0x8)).toString(16);
+        });
+        return uuid;
+      };
+
+      function makeDropZone(boxInfo, data){
+        var result = new Kinetic.Group({
+          x: boxInfo.x,
+          y: boxInfo.y,
+          width: boxInfo.width,
+          height: boxInfo.height
+        });
+        result.id = data.id;
+        result.info = boxInfo;
+        result.occupied = false;
+
+        var complexText = new Kinetic.Text({
+          text: data.text,
+          fontSize: 18,
+          fontFamily: 'Calibri',
+          fill: '#555',
+          width: boxInfo.width,
+          height: boxInfo.height,
+          padding: 20,
+          align: 'center',
+          verticalAlign: 'middle'
+        });
+
+        var rect = new Kinetic.Rect({
+          stroke: '#555',
+          strokeWidth: 5,
+          fill: '#ddd',
+          width: boxInfo.width,
+          height: boxInfo.height,
+          height: complexText.getHeight(),
+          shadowColor: 'black',
+          shadowBlur: 10,
+          shadowOffset: [10, 10],
+          shadowOpacity: 0.2,
+          cornerRadius: 10
+        });
+
+        result.add(rect);
+        result.add(complexText);
+
+        return result;
+      }
+
+      function checkIntersection(zones, boxPosition) {
+        var zone = null;
+        for (var a in zones) {
+          var zonePos = zones[a].getPosition();
+          var zoneSize = zones[a].getSize();
+          if(zonePos.x < boxPosition.x 
+            && zonePos.y < boxPosition.y
+            && zonePos.x + zoneSize.width > boxPosition.x 
+            && zonePos.y + zoneSize.height > boxPosition.y) {
+            zone = zones[a];
+            break;
+          }
+        }
+        return zone;
+      }
+
+      function makeBox(boxInfo, data){
+        var result = new Kinetic.Group({
+          draggable: true,
+          x: boxInfo.x,
+          y: boxInfo.y,
+          width: boxInfo.width
+          /*
+          dragBoundFunc: function(pos) {
+            return {
+              x: pos.x,
+              y: this.getAbsolutePosition().y
+            }
+          }
+          */
+        });
+
+        result.id = data.id;
+        result.info = boxInfo;
+        result.occupyZone = null;
+
+        var complexText = new Kinetic.Text({
+          text: data.text,
+          fontSize: 18,
+          fontFamily: 'Calibri',
+          fill: '#555',
+          width: boxInfo.width,
+          padding: 20,
+          align: 'center'
+        });
+
+        var rect = new Kinetic.Rect({
+          stroke: '#555',
+          strokeWidth: 5,
+          fill: '#fff',
+          width: boxInfo.width,
+          height: complexText.getHeight(),
+          shadowColor: 'black',
+          shadowBlur: 10,
+          shadowOffset: [10, 10],
+          shadowOpacity: 0.2,
+          cornerRadius: 10
+        });
+
+        result.add(rect);
+        result.add(complexText);
+
+        result.on('dragend', function() { 
+          console.log(this.id + " : drop");
+
+          var zone = checkIntersection(dropZones, this.getPosition());
+          
+          if(zone == null || zone.occupied == true) {
+            result.setPosition({x:this.info.x, y:this.info.y});
+            
+            if(result.occupyZone != null) {
+              result.occupyZone.occupied = false;
+              result.occupyZone = null;
+            }
+          } else {
+            result.setPosition({x:zone.getX(), y:zone.getY()});
+
+            if(result.occupyZone != null) {
+              result.occupyZone.occupied = false;
+              result.occupyZone = null;
+            }
+            
+            zone.occupied = true;
+            result.occupyZone = zone;
+          }
+          shapesLayer.draw();
+        });
+
+        return result;
+      }
+    </script>
+  </body>
+</html>
