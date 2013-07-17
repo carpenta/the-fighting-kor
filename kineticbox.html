@@ -11,183 +11,98 @@
   <body>
     <div id="container"></div>
     <script src="http://d3lp1msu2r81bx.cloudfront.net/kjs/js/lib/kinetic-v4.5.4.min.js"></script>
+    <script src="./static/tournament.js"></script>
     <script defer="defer">
+      var settings = defaultSettings;
       var dropZones = [];
-
       var stage = new Kinetic.Stage({
         container: 'container',
-        width: 1000,
-        height: 800
+        width: settings.screenWidth,
+        height: settings.screenHeight
       });
 
       var shapesLayer = new Kinetic.Layer();
       var fieldLayer = new Kinetic.Layer();
-      
-      // group.on('mouseover', function() {
-      //   document.body.style.cursor = 'pointer';
-      // });
-      // group.on('mouseout', function() {
-      //   document.body.style.cursor = 'default';
-      // });      
-      fieldLayer.add(makeDropZone({x:20, y:500, width:100, height:100}, {id:100, text:"zone1"}));
-      fieldLayer.add(makeDropZone({x:170, y:500, width:100, height:100}, {id:100, text:"zone2"}));
-      fieldLayer.add(makeDropZone({x:320, y:500, width:100, height:100}, {id:100, text:"zone3"}));
-      fieldLayer.add(makeDropZone({x:470, y:500, width:100, height:100}, {id:100, text:"zone4"}));
-      stage.add(fieldLayer);
-      dropZones = fieldLayer.getChildren().toArray();
+      var background = new Kinetic.Layer();
 
-      shapesLayer.add(makeBox({x:700, y:20, width:100}, {id:1, text:"p1, p2"}));
-      shapesLayer.add(makeBox({x:700, y:120, width:100}, {id:2, text:"p3, p4"}));
-      shapesLayer.add(makeBox({x:700, y:220, width:100}, {id:3, text:"p5, p6"}));
-      shapesLayer.add(makeBox({x:700, y:320, width:100}, {id:4, text:"p7, p8"}));
-      stage.add(shapesLayer);
+      var dropCallback = function(evt) { 
+        var zone = checkIntersection(dropZones, {x: evt.x, y: evt.y});
+        
+        if(zone == null || (zone.occupied == true && this.occupyZone != zone)) {
+          this.setPosition({x: this.info.x, y: this.info.y});
+          
+          if(this.occupyZone != null) {
+            this.occupyZone.occupied = false;
+            this.occupyZone = null;
+          }
+        } else {
+          this.setPosition({
+            x: zone.getX() + (settings.zoneWidth - this.getWidth())/2, 
+            y: zone.getY() + (settings.zoneHeight - this.getHeight())/2
+          });
 
-
-
-
-      function generateUUID(){
-        var d = new Date().getTime();
-        var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-          var r = (d + Math.random()*16)%16 | 0;
-          d = Math.floor(d/16);
-          return (c=='x' ? r : (r&0x7|0x8)).toString(16);
-        });
-        return uuid;
+          if(this.occupyZone != null) {
+            this.occupyZone.occupied = false;
+            this.occupyZone = null;
+          }
+          
+          zone.occupied = true;
+          this.occupyZone = zone;
+        }
+        shapesLayer.draw();
       };
 
-      function makeDropZone(boxInfo, data){
-        var result = new Kinetic.Group({
-          x: boxInfo.x,
-          y: boxInfo.y,
-          width: boxInfo.width,
-          height: boxInfo.height
-        });
-        result.id = data.id;
-        result.info = boxInfo;
-        result.occupied = false;
-
-        var complexText = new Kinetic.Text({
-          text: data.text,
-          fontSize: 18,
-          fontFamily: 'Calibri',
-          fill: '#555',
-          width: boxInfo.width,
-          height: boxInfo.height,
-          padding: 20,
-          align: 'center',
-          verticalAlign: 'middle'
-        });
-
-        var rect = new Kinetic.Rect({
-          stroke: '#555',
-          strokeWidth: 5,
-          fill: '#ddd',
-          width: boxInfo.width,
-          height: boxInfo.height,
-          height: complexText.getHeight(),
-          shadowColor: 'black',
-          shadowBlur: 10,
-          shadowOffset: [10, 10],
-          shadowOpacity: 0.2,
-          cornerRadius: 10
-        });
-
-        result.add(rect);
-        result.add(complexText);
-
-        return result;
-      }
-
-      function checkIntersection(zones, boxPosition) {
-        var zone = null;
-        for (var a in zones) {
-          var zonePos = zones[a].getPosition();
-          var zoneSize = zones[a].getSize();
-          if(zonePos.x < boxPosition.x 
-            && zonePos.y < boxPosition.y
-            && zonePos.x + zoneSize.width > boxPosition.x 
-            && zonePos.y + zoneSize.height > boxPosition.y) {
-            zone = zones[a];
-            break;
-          }
+      var depth = settings.depth;
+      for (var f=1; f<=depth; f++){
+        var zoneInfo = {
+          x: settings.zonePadding + ((depth - f) * settings.zoneMargin/2) ,
+          y: settings.screenHeight/2 - settings.zoneHeight - settings.zonePadding - (depth - f) * settings.zoneHeight,
+          width: settings.zoneWidth,
+          height: settings.zoneHeight,
+          margin: settings.zoneMargin * (depth / f)
+        };
+        for (var i=0; i<f; i++){
+          var line = new Kinetic.Line({
+            points: [
+              (zoneInfo.x + zoneInfo.width/2)+(zoneInfo.margin*2*i), zoneInfo.y, 
+              (zoneInfo.x + zoneInfo.width/2)+(zoneInfo.margin*2*i), zoneInfo.y - zoneInfo.height, 
+              (zoneInfo.x + zoneInfo.width/2 + zoneInfo.margin)+(zoneInfo.margin*2*i), zoneInfo.y - zoneInfo.height, 
+              (zoneInfo.x + zoneInfo.width/2 + zoneInfo.margin)+(zoneInfo.margin*2*i), zoneInfo.y
+            ],
+            stroke: settings.strokeColor,
+            strokeWidth: settings.strokeSize,
+            lineCap: 'round',
+            lineJoin: 'round'
+          });
+          background.add(line);
         }
-        return zone;
       }
+      stage.add(background);
 
-      function makeBox(boxInfo, data){
-        var result = new Kinetic.Group({
-          draggable: true,
-          x: boxInfo.x,
-          y: boxInfo.y,
-          width: boxInfo.width
-          /*
-          dragBoundFunc: function(pos) {
-            return {
-              x: pos.x,
-              y: this.getAbsolutePosition().y
-            }
-          }
-          */
-        });
 
-        result.id = data.id;
-        result.info = boxInfo;
-        result.occupyZone = null;
+      for (var b=0; b<Math.pow(2, depth); b++){
+        var zoneInfo = {
+          x: settings.zonePadding + b*settings.zoneMargin,
+          y: settings.screenHeight/2 - settings.zoneHeight - settings.zonePadding,
+          width: settings.zoneWidth,
+          height: settings.zoneHeight,
+          margin: settings.zoneMargin
+        }
+        var dropZone = makeDropZone(zoneInfo, {id:b*100, text:"zone" + (b+1)});
+        fieldLayer.add(dropZone);  
+        dropZones.push(dropZone);
 
-        var complexText = new Kinetic.Text({
-          text: data.text,
-          fontSize: 18,
-          fontFamily: 'Calibri',
-          fill: '#555',
-          width: boxInfo.width,
-          padding: 20,
-          align: 'center'
-        });
+        var boxInfo = {
+          x: settings.screenWidth - settings.boxPadding - settings.boxWidth, 
+          y: settings.boxPadding + b * settings.boxHeight, 
+          width: settings.boxWidth, 
+          height: settings.boxHeight
+        };
 
-        var rect = new Kinetic.Rect({
-          stroke: '#555',
-          strokeWidth: 5,
-          fill: '#fff',
-          width: boxInfo.width,
-          height: complexText.getHeight(),
-          shadowColor: 'black',
-          shadowBlur: 10,
-          shadowOffset: [10, 10],
-          shadowOpacity: 0.2,
-          cornerRadius: 10
-        });
-
-        result.add(rect);
-        result.add(complexText);
-
-        result.on('dragend', function() { 
-          console.log(this.id + " : drop");
-
-          var zone = checkIntersection(dropZones, this.getPosition());
-          
-          if(zone == null || zone.occupied == true) {
-            result.setPosition({x:this.info.x, y:this.info.y});
-            
-            if(result.occupyZone != null) {
-              result.occupyZone.occupied = false;
-              result.occupyZone = null;
-            }
-          } else {
-            result.setPosition({x:zone.getX(), y:zone.getY()});
-
-            if(result.occupyZone != null) {
-              result.occupyZone.occupied = false;
-              result.occupyZone = null;
-            }
-            
-            zone.occupied = true;
-            result.occupyZone = zone;
-          }
-          shapesLayer.draw();
-        });
-
-        return result;
-      }
+        shapesLayer.add(makeBox(boxInfo, {id: b, text: "p"+(1+2*b)+", p"+(2+2*b)}, dropCallback));
+      }      
+      stage.add(fieldLayer);
+      stage.add(shapesLayer);
     </script>
   </body>
 </html>
