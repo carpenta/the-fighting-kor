@@ -117,7 +117,7 @@ class JsonPage(webapp2.RequestHandler):
 		self.response.write(json.dumps(participants))
 		#self.response.write(json.dumps([p.name for p in Participant.query().fetch()]))
 
-class JsonPage(webapp2.RequestHandler):
+class TestPage(webapp2.RequestHandler):
 	def get(self):
 		template = JINJA_ENVIRONMENT.get_template('kineticbox.html') 
 		self.response.write(template.render({}))
