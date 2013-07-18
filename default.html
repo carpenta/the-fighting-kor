@@ -18,8 +18,7 @@
 	var background = new Kinetic.Layer();
 
 	var dropCallback = function(evt) { 
-		var zone = checkIntersection(dropZones, {x: evt.x, y: evt.y});
-		
+		var zone = checkIntersection(dropZones, {x: evt.offsetX, y: evt.offsetY});
 		if(zone == null || (zone.occupied == true && this.occupyZone != zone)) {
 			this.setPosition({x: this.info.x, y: this.info.y});
 			
