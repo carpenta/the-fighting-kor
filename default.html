@@ -1,51 +1,98 @@
 <div class="row">
-	<div class="span6">
-		<h1>경기장 1</h1>
-		<div>
-			<table class="table table-striped">
-				<thead>
-					<tr>
-						<th></th>
-						<th>선수1<th>
-						<th>선수2<th>
-						<th>승자<th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<td>1</td>
-						<td>&nbsp;</td>
-						<td>&nbsp;</td>
-						<td>&nbsp;</td>
-					</tr>
-					<tr>
-						<td>2</td>
-						<td></td>
-						<td></td>
-						<td></td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-	</div>
-	<div class="span6">
-		<h1>경기장 2</h1>
-		<div class="alert alert-info">
-			경기내용
-		</div>
-	</div>
+	<div id="container"></div>
 </div>
-<div class="row">
-	<div class="span6">
-		<h1>경기장 3</h1>
-		<div class="alert alert-info">
-			경기내용
-		</div>
-	</div>
-	<div class="span6">
-		<h1>경기장 4</h1>
-		<div class="alert alert-info">
-			경기내용
-		</div>
-	</div>
-</div>
+
+<script src="http://d3lp1msu2r81bx.cloudfront.net/kjs/js/lib/kinetic-v4.5.4.min.js"></script>
+<script src="./static/tournament.js"></script>
+<script defer="defer">
+	var settings = defaultSettings;
+	var dropZones = [];
+	var stage = new Kinetic.Stage({
+		container: 'container',
+		width: settings.screenWidth,
+		height: settings.screenHeight
+	});
+
+	var shapesLayer = new Kinetic.Layer();
+	var fieldLayer = new Kinetic.Layer();
+	var background = new Kinetic.Layer();
+
+	var dropCallback = function(evt) { 
+		var zone = checkIntersection(dropZones, {x: evt.x, y: evt.y});
+		
+		if(zone == null || (zone.occupied == true && this.occupyZone != zone)) {
+			this.setPosition({x: this.info.x, y: this.info.y});
+			
+			if(this.occupyZone != null) {
+				this.occupyZone.occupied = false;
+				this.occupyZone = null;
+			}
+		} else {
+			this.setPosition({
+				x: zone.getX() + (settings.zoneWidth - this.getWidth())/2, 
+				y: zone.getY() + (settings.zoneHeight - this.getHeight())/2
+			});
+
+			if(this.occupyZone != null) {
+				this.occupyZone.occupied = false;
+				this.occupyZone = null;
+			}
+			
+			zone.occupied = true;
+			this.occupyZone = zone;
+		}
+		shapesLayer.draw();
+	};
+
+	var depth = settings.depth;
+	for (var f=1; f<=depth; f++){
+		var zoneInfo = {
+			x: settings.zonePadding + ((depth - f) * settings.zoneMargin/2) ,
+			y: settings.screenHeight/2 - settings.zoneHeight - settings.zonePadding - (depth - f) * settings.zoneHeight,
+			width: settings.zoneWidth,
+			height: settings.zoneHeight,
+			margin: settings.zoneMargin * (depth / f)
+		};
+		for (var i=0; i<f; i++){
+			var line = new Kinetic.Line({
+				points: [
+					(zoneInfo.x + zoneInfo.width/2)+(zoneInfo.margin*2*i), zoneInfo.y, 
+					(zoneInfo.x + zoneInfo.width/2)+(zoneInfo.margin*2*i), zoneInfo.y - zoneInfo.height, 
+					(zoneInfo.x + zoneInfo.width/2 + zoneInfo.margin)+(zoneInfo.margin*2*i), zoneInfo.y - zoneInfo.height, 
+					(zoneInfo.x + zoneInfo.width/2 + zoneInfo.margin)+(zoneInfo.margin*2*i), zoneInfo.y
+				],
+				stroke: settings.strokeColor,
+				strokeWidth: settings.strokeSize,
+				lineCap: 'round',
+				lineJoin: 'round'
+			});
+			background.add(line);
+		}
+	}
+	stage.add(background);
+
+
+	for (var b=0; b<Math.pow(2, depth); b++){
+		var zoneInfo = {
+			x: settings.zonePadding + b*settings.zoneMargin,
+			y: settings.screenHeight/2 - settings.zoneHeight - settings.zonePadding,
+			width: settings.zoneWidth,
+			height: settings.zoneHeight,
+			margin: settings.zoneMargin
+		}
+		var dropZone = makeDropZone(zoneInfo, {id:b*100, text:"zone" + (b+1)});
+		fieldLayer.add(dropZone);  
+		dropZones.push(dropZone);
+
+		var boxInfo = {
+			x: settings.screenWidth - settings.boxPadding - settings.boxWidth, 
+			y: settings.boxPadding + b * settings.boxHeight, 
+			width: settings.boxWidth, 
+			height: settings.boxHeight
+		};
+
+		shapesLayer.add(makeBox(boxInfo, {id: b, text: "p"+(1+2*b)+", p"+(2+2*b)}, dropCallback));
+	}      
+	stage.add(fieldLayer);
+	stage.add(shapesLayer);
+</script>
