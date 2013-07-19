@@ -141,7 +141,7 @@ class FightInfoPage(webapp2.RequestHandler):
 			fightdict['player2'] = dictWithKey(fight.player2.get())
 			if fight.winner != None:
 				fightdict['winner'] = dictWithKey(fight.winner.get())
-			fights.append(fight)
+			fights.append(fightdict)
 
 		self.response.write(json.dumps(fights))
 
