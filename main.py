@@ -82,6 +82,7 @@ class PlayerPage(webapp2.RequestHandler):
 			player.association = self.request.get('user_assoc', 'unknown')
 			player.weight = self.request.get('user_weight', 'unknown')
 			player.grade = self.request.get('user_grade', 'infinite')
+			player.group = self.request.get('user_group', 'unknown')
 			player.put()
 			self.response.write("<a href='/?menu=player'>success</a>")
 		else:
