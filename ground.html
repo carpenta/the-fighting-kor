@@ -23,22 +23,29 @@
 						{% endfor %}
 					</select>
 				</p>
-				<p> 경기 조번호 :	<input type="text" name="tournament_num" class="input-small" /> </p>
+				<p> 경기 조번호 :	<input type="text" name="playground_num" class="input-small" /> </p>
+				<p> 토너먼트 :	 
+					<select name="tournament_num">
+						{% for t in tournaments %}
+						<option value="{{t.key.urlsafe()}}">
+							{{t.tournament_name}}
+						</option>
+						{% endfor %}
+					</select>
+				</p>
 				<input type="submit" class="btn btn-warning" />
 			</form>
 		</div>
 	</div>
 	<div class="span6">
 		<div class="row">
-			<h1>경기 목록</h1>
+			<h1>경기장 목록</h1>
 		</div>
 		<div class="row">
 			<ul>
-			{% for t in tournaments %}
+			{% for pg in playgrounds %}
 			<li>
-				[{{t.tournament_num}}] 
-				{{t.participant1.get().name}} vs {{t.participant2.get().name}}
-				({{t.status}})
+				{{pg.ground_num}}
 			</li>
 			{% endfor %}
 			</ul>

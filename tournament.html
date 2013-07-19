@@ -1,47 +1,74 @@
 <div class="row" style="margin-top:30px">
 	<div class="span6">
 		<div class="row">
-			<h1>경기 생성</h1>
-		</div>
-		<div class="row">
+			<h1>토너먼트 생성</h1>
 			<form method="POST" action="./tournaments">
-				<p> 선수 1 :
-					<select name="p1_id">
-						{% for p in participants %}
-						<option value="{{p.key.urlsafe()}}">
-							{{p.name}} ({{p.association}} - {{p.grade}})
-						</option>
-						{% endfor %}
-					</select>
+				<p> 토너먼트 이름 : <input type="text" name="tournament_name" /></p>
+				<p> 토너먼트 단계 수 :	
+					<div class="btn-group" data-toggle="buttons-radio">
+						<button type="button" class="btn">4</button>
+						<button type="button" class="btn">8</button>
+						<button type="button" class="btn">16</button>
+						<button type="button" class="btn">32</button>
+					</div> 강
+					<input type="hidden" id="tournament_level" name="tournament_level" />
 				</p>
-				<p> 선수 2 : 
-					<select name="p2_id">
-						{% for p in participants %}
-						<option value="{{p.key.urlsafe()}}">
-							{{p.name}} ({{p.association}} - {{p.grade}})
-						</option>
-						{% endfor %}
-					</select>
-				</p>
-				<p> 경기 조번호 :	<input type="text" name="tournament_num" class="input-small" /> </p>
 				<input type="submit" class="btn btn-warning" />
 			</form>
 		</div>
 	</div>
 	<div class="span6">
 		<div class="row">
-			<h1>경기 목록</h1>
+			<h1>토너먼트 목록</h1>
 		</div>
 		<div class="row">
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th>토너먼트 이름</th>
+						<th>토너먼트 단계 수<th>
+					</tr>
+				</thead>
+				<tbody>
+				{% for t in tournaments %}
+				<tr>
+					<td>{{t.tournament_name}}</td><td>{{t.tournament_level}}</td>
+				</tr>
+				{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+<div class="row">
+	<div class="span6">
+		<div class="row">
+			<h1>경기장 생성</h1>
+			<form method="POST" action="./playground">
+				<p> 경기장 번호 : <input type="text" name="playground_num" /> </p>
+				<input type="submit" class="btn btn-warning" />
+			</form>
+		</div>
+	</div>
+	<div class="span6">
+		<div class="row">
+			<h1>경기장 목록</h1>
 			<ul>
-			{% for t in tournaments %}
-			<li>
-				[{{t.tournament_num}}] 
-				{{t.participant1.get().name}} vs {{t.participant2.get().name}}
-				({{t.status}})
-			</li>
-			{% endfor %}
+				{% for pg in playground %}
+				<li>{{pg.playground_num}}</li>
+				{% endfor %}
 			</ul>
 		</div>
 	</div>
 </div>
+
+<script defer="defer">
+$(function(){
+	$(".btn-group button").click(function () {
+		$("#tournament_level").val($(this).text());
+	});
+
+	$(".btn-group button:first").click();
+});
+</script>

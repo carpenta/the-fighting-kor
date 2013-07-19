@@ -30,12 +30,20 @@ class Participant(ndb.Model):
 	#operator = ndb.UserProperty()
 	#date = ndb.DateTimeProperty(auto_now_add=True)
 
-class Tournament(ndb.Model):
-	tournament_num = ndb.StringProperty()
+class Fight(ndb.Model):
 	participant1 = ndb.KeyProperty(kind=Participant)
 	participant2 = ndb.KeyProperty(kind=Participant)
 	status = ndb.StringProperty()
 	winner = ndb.KeyProperty(kind=Participant)
+
+class Tournament(ndb.Model):
+	tournament_name = ndb.StringProperty()
+	tournament_level = ndb.IntegerProperty()
+	tournament_num = ndb.StringProperty()
+
+class PlayGround(ndb.Model):
+	playground_num = ndb.IntegerProperty()
+	fights = ndb.StructuredProperty(Fight, repeated=False)
 
 class MainPage(webapp2.RequestHandler):
 	def get(self):
@@ -44,6 +52,7 @@ class MainPage(webapp2.RequestHandler):
 			template_values = {
 				'participants' : Participant.query(),
 				'tournaments' : Tournament.query(),
+				'playground' : PlayGround.query(),
 				'menu_context' : self.request.get("menu")
 			}
 			template = JINJA_ENVIRONMENT.get_template('index.html') 
@@ -54,7 +63,7 @@ class MainPage(webapp2.RequestHandler):
 class PlayerPage(webapp2.RequestHandler):
 	def get(self):
 		self.response.write("test")
-	def post(self): 
+	def post(self):
 		if users.get_current_user():	
 			participant = Participant()
 			participant.name = self.request.get('user_name', 'unknown')
@@ -66,42 +75,38 @@ class PlayerPage(webapp2.RequestHandler):
 		else:
 			self.response.write("fail")
 
-class Ground(webapp2.RequestHandler):
-	def get(self):
-		ground_num = self.request.get("gid")
-		
-		self.response.write("test")
-	def post(self):
-		if users.get_current_user():
-			fightmatch = FightMatch()
-			fightmatch.section_num = self.request.get('section')
-			fightmatch.match_num = self.request.get('match')
-			fightmatch.put()
-			self.response.write("<a href='/?menu=ground'>success</a>")
-		else:
-			self.response.write("fail")
-
 class TournamentPage(webapp2.RequestHandler):
 	def get(self):
-		ground_num = self.request.get("ground")
 		tournaments = []
 		for t in Tournament.query().fetch():
 			tournament = dictWithKey(t)
-			tournament['participant1'] = dictWithKey(t.participant1.get())
-			tournament['participant2'] = dictWithKey(t.participant2.get())
 			tournaments.append(tournament)
 
 		self.response.write(json.dumps(tournaments))	
 		
 	def post(self):
 		tournament = Tournament()
-		tournament.tournament_num = self.request.get('tournament_num', 'error')
-		tournament.status = "running" #self.reqeust.get('status')
-		tournament.participant1 = ndb.Key(urlsafe=self.request.get('p1_id'))
-		tournament.participant2 = ndb.Key(urlsafe=self.request.get('p2_id'))
-		#tournament.winner = Participant.query(self.request.get('winner_id')).get()
+		#tournament.tournament_num = self.request.get('tournament_num', 'error')
+		tournament.tournament_name = self.request.get('tournament_name')
+		tournament.tournament_level = int(self.request.get('tournament_level', '0'))
 		tournament.put()
-		self.response.write("<a href='/?menu=ground'>success</a>")
+		self.response.write("<a href='/?menu=tournament'>success</a>")
+
+class PlayGroundPage(webapp2.RequestHandler):
+	def get(self):
+		pgs = []
+		for pg in PlayGround.query().fetch():
+			playground = dictWithKey(pg)
+			pgs.append(playground)
+
+		self.response.write(json.dumps(pgs))
+
+	def post(self):
+		playground = PlayGround()
+		playground.playground_num = int(self.request.get('playground_num'), 0)
+		playground.put()
+		self.response.write("<a href='/?menu=tournament'>success</a>")
+
 
 class JsonPage(webapp2.RequestHandler):
 	def get(self):
@@ -125,8 +130,8 @@ class TestPage(webapp2.RequestHandler):
 application = webapp2.WSGIApplication([
 	('/', MainPage),
 	('/player', PlayerPage),
-	('/ground', Ground),
 	('/tournaments', TournamentPage),
+	('/playground', PlayGroundPage),
 	('/json', JsonPage),
 	('/test', TestPage),
 ], debug=True)

@@ -46,6 +46,8 @@
 		{% include "player.html" %}
 	{% elif menu_context == "ground" %}
 		{% include "ground.html" %}
+  {% elif menu_context == "tournament" %}
+    {% include "tournament.html" %}
 	{% else %}
 		{% include "default.html" %}
 	{% endif %}
