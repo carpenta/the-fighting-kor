@@ -4,10 +4,10 @@
 			<h1>경기 생성</h1>
 		</div>
 		<div class="row">
-			<form method="POST" action="./tournaments">
+			<form method="POST" action="./fight">
 				<p> 선수 1 :
 					<select name="p1_id">
-						{% for p in participants %}
+						{% for p in players %}
 						<option value="{{p.key.urlsafe()}}">
 							{{p.name}} ({{p.association}} - {{p.grade}})
 						</option>
@@ -16,16 +16,16 @@
 				</p>
 				<p> 선수 2 : 
 					<select name="p2_id">
-						{% for p in participants %}
+						{% for p in players %}
 						<option value="{{p.key.urlsafe()}}">
 							{{p.name}} ({{p.association}} - {{p.grade}})
 						</option>
 						{% endfor %}
 					</select>
 				</p>
-				<p> 경기 조번호 :	<input type="text" name="playground_num" class="input-small" /> </p>
+				<p> 경기 조번호 :	<input type="text" name="tournament_num" class="input-small" /> </p>
 				<p> 토너먼트 :	 
-					<select name="tournament_num">
+					<select name="tournament_id">
 						{% for t in tournaments %}
 						<option value="{{t.key.urlsafe()}}">
 							{{t.tournament_name}}
@@ -39,16 +39,51 @@
 	</div>
 	<div class="span6">
 		<div class="row">
-			<h1>경기장 목록</h1>
+			<h1>경기 목록</h1>
 		</div>
 		<div class="row">
-			<ul>
-			{% for pg in playgrounds %}
-			<li>
-				{{pg.ground_num}}
-			</li>
-			{% endfor %}
-			</ul>
+			<table class="table table-striped table-bordered">
+				<thead>
+					<tr>
+						<th>토너먼트 이름</th><th>조번호</th><th>선수1</th><th>선수2</th><th>경기장 번호</th><th>경기장 설정</th>
+					</tr>
+				</thead>
+				<tbody>
+				
+				{% for f in fights %}
+				<tr id="{{f.key.urlsafe()}}">
+					<td>{{f.tournament.get().tournament_name}}</td>
+					<td>{{f.tournament_num}}</td>
+					<td>{{f.player1.get().name}}</td>
+					<td>{{f.player2.get().name}}</td>
+					<td>{{f.playground_num}}</td>
+					<td>
+						<form method="POST" action="./fight/update?fight={{f.key.urlsafe()}}">
+						<div class="btn-group" data-toggle="buttons-radio">
+							{% for pg in playgrounds %}
+							<button type="button" class="btn">{{pg.playground_num}}</button>
+							{% endfor %}
+						</div>
+						<input type="hidden" id="playground_num_{{f.key.urlsafe()}}" name="playground_num" />
+						<input type="submit" value="저장" />
+						</form>
+					</td>
+				</tr>
+				
+				{% endfor %}
+				
+				</tbody>
+			</table>
 		</div>
 	</div>
 </div>
+
+
+<script defer="defer">
+$(function(){
+	$(".btn-group button").click(function () {
+		var k = $(this).closest('tr').attr("id");
+		$("#playground_num_"+k).val($(this).text());
+	});
+});
+</script>
