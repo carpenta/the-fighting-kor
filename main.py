@@ -27,6 +27,7 @@ class Player(ndb.Model):
 	association = ndb.StringProperty()
 	weight = ndb.StringProperty()
 	grade = ndb.StringProperty()
+	group = ndb.StringProperty()
 	#operator = ndb.UserProperty()
 	#date = ndb.DateTimeProperty(auto_now_add=True)
 

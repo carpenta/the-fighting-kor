@@ -7,8 +7,33 @@
 			<form method="POST" action="./player">
 				<p> 선수 이름 : <input type="text" name="user_name" /> </p>
 				<p> 선수 소속 : <input type="text" name="user_assoc" /> </p>
-				<p> 선수 체급 : <input type="text" name="user_weight" /> </p>
-				<p> 선수 단수 : <input type="text" name="user_grade" /> </p>
+				<p> 선수 그룹 : 
+				<select name="user_group">
+					<optgroup label="학생">
+						<option value="학생,초등">초등 : 30, 35, 40, 45, 50, 55, +55</option>
+						<option value="학생,중등">중등 : 53.5, 58.5, 64, 69, 74, 79.3, +79.3</option>
+						<option value="학생,중등(여)">중등(여) : 53.5, 58.5, 64, 69, 74, 79.3, +79.3</option>
+						<option value="학생,고등">고등 : 53.5, 58.5, 64, 69, 74, 79.3, +79.3</option>
+						<option value="학생,고등(여)">고등(여) : 53.5, 58.5, 64, 69, 74, 79.3, +79.3</option>
+				  	</optgroup>
+				  	<optgroup label="성인">
+						<option value="어덜트">어덜트 : 57.5, 64, 70, 76, 82.3, 88.3, 94.3, +94.3</option>
+						<option value="마스터">마스터 : 57.5, 64, 70, 76, 82.3, 88.3, 94.3, +94.3</option>
+						<option value="시니어">시니어 : 57.5, 64, 70, 76, 82.3, 88.3, 94.3, +94.3</option>
+						<option value="여성">여성 : 53.5, 58.5, 64, 69, 74, 79.3, +79.3</option>
+					</optgroup>
+				</select>
+				</p>
+				<p> 선수 체급 : <input type="text" name="user_weight" />
+				<p> 선수 급수(단): 
+				<select name="user_grade">
+					<option value="화이트">화이트</value>
+					<option value="블루">블루</value>
+					<option value="퍼플">퍼플</value>
+					<option value="브라운">브라운</value>
+					<option value="블랙">블랙</value>
+				</select>
+				</p>
 
 				<input type="submit" class="btn btn-warning" />
 			</form>
@@ -25,6 +50,7 @@
 					<tr>
 						<th>선수 이름</th>
 						<th>선수 소속</th>
+						<th>선수 그룹</th>
 						<th>선수 체급</th>
 						<th>선수 단수</th>
 						<th>...</th>
@@ -35,6 +61,7 @@
 				<tr>
 					<td>{{p.name}}</td>
 					<td>{{p.association}}</td>
+					<td>{{p.group}}</td>
 					<td>{{p.weight}}</td>
 					<td>{{p.grade}}</td>
 					<td><button class='btn btn-danger'>Del</button></td>
