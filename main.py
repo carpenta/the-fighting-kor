@@ -130,6 +130,21 @@ class FightListPage(webapp2.RequestHandler):
 
 		self.response.write(json.dumps(fights))
 
+class FightInfoPage(webapp2.RequestHandler):
+	def get(self):
+		fights = []
+		ground = self.request.get('ground', 1)
+		for fight in Fight.query(Fight.playground_num == int(ground)).fetch():
+			fightdict = dictWithKey(fight)
+			fightdict['tournament'] = dictWithKey(fight.tournament.get())
+			fightdict['player1'] = dictWithKey(fight.player1.get())
+			fightdict['player2'] = dictWithKey(fight.player2.get())
+			if fight.winner != None:
+				fightdict['winner'] = dictWithKey(fight.winner.get())
+			fights.append(fight)
+
+		self.response.write(json.dumps(fights))
+
 class FightPage(webapp2.RequestHandler):
 	def get(self):
 		gid = self.request.get('gid', 1)
@@ -189,6 +204,7 @@ application = webapp2.WSGIApplication([
 	('/tournaments', TournamentPage),
 	('/playground', PlayGroundPage),
 	('/fights', FightListPage),
+	('/fightinfo', FightInfoPage),
 	('/fight', FightPage),
 	('/fight/update', FightUpdatePage),
 	('/json', JsonPage),
