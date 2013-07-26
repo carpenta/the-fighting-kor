@@ -15,7 +15,6 @@ JINJA_ENVIRONMENT = jinja2.Environment(
 loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
 extensions=['jinja2.ext.autoescape'])
 
-
 def dictWithKey(model):
 	result = model.to_dict()
 	result['id'] = model.key.urlsafe()
@@ -57,7 +56,7 @@ class MainPage(webapp2.RequestHandler):
 			playgrounds = PlayGround.query().order(PlayGround.playground_num).fetch()
 			playground_fights = {}
 			for pg in playgrounds:
-				playground_fights[pg.playground_num] = Fight.query(Fight.playground_num == pg.playground_num).fetch()
+				playground_fights[pg.playground_num] = Fight.query(Fight.playground_num == pg.playground_num, Fight.status == 'running').fetch()
 
 			template_values = {
 				'players' : Player.query(),
@@ -179,6 +178,18 @@ class FightUpdatePage(webapp2.RequestHandler):
 
 		self.response.write("<a href='/?menu=ground'>success</a>")		
 
+class FightStateTogglePage(webapp2.RequestHandler):
+	def post(self):
+		fight = ndb.Key(urlsafe=self.request.get('fight')).get()
+
+		if fight.status == "running":
+			fight.status = "end"
+		else:
+			fight.status = "running"
+		fight.put()
+
+		self.response.write("<a href='/?menu=ground'>success</a>")		
+
 class JsonPage(webapp2.RequestHandler):
 	def get(self):
 		if self.request.get("key") :
@@ -207,8 +218,7 @@ application = webapp2.WSGIApplication([
 	('/fightinfo', FightInfoPage),
 	('/fight', FightPage),
 	('/fight/update', FightUpdatePage),
+	('/fight/toggleState', FightStateTogglePage),
 	('/json', JsonPage),
 	('/test', TestPage)
 ], debug=True)
-
-
