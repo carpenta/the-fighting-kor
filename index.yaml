@@ -1,6 +1,6 @@
 indexes:
-- kind: Greeting
+- kind: Fight
   ancestor: yes
   properties:
-  - name: date
+  - name: tournament_num
     direction: desc
