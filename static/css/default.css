@@ -1,0 +1,15 @@
+#body_content {
+  padding-top: 40px; 
+}
+#footer{
+  margin-top:20px;
+  padding:10px;
+  background-color: #eee;
+}
+
+.border-round{
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  border:1px solid #eee;
+}
