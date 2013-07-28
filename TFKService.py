@@ -2,10 +2,8 @@
 import json
 
 from google.appengine.ext import ndb
-
 from TFKModel import *
 from TFKUtil import *
-
 
 class PlayerService():
 	def getPlayers(self):
@@ -73,6 +71,27 @@ class TournamentService():
 			tournament = dictWithKey(t)
 			tournaments.append(tournament)
 		return json.dumps(tournaments)
+
+	def getTournamentWithFightJson(self):
+		tournaments = []
+		for t in Tournament.query().fetch():
+			tournament = dictWithKey(t)
+
+			fights = {} 
+			for f in Fight.query(Fight.tournament == t.key):
+				fight = dictWithKey(f)
+				print fight
+				del fight['tournament']
+				fight['player1'] = dictWithKey(f.player1.get())
+				fight['player2'] = dictWithKey(f.player2.get())
+				if f.winner != None:
+					fight['winner'] = dictWithKey(f.winner.get())
+				fights[f.tournament_num] = fight
+
+			tournament['fights'] = fights
+			tournaments.append(tournament)
+		return json.dumps(tournaments);
+		
 
 	def addTournament(self, request):
 		if request is None:

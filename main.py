@@ -1,14 +1,12 @@
 # -*- coding: utf8 -*-
 
 import sys, os
-
-from google.appengine.api import users
-from google.appengine.ext import ndb
-
 import webapp2
 import jinja2
 import json
 
+from google.appengine.api import users
+from google.appengine.ext import ndb
 from TFKModel import *
 from TFKService import *
 from TFKUtil import *
@@ -43,7 +41,6 @@ class MainPage(webapp2.RequestHandler):
 		else:
 			self.redirect(users.create_login_url(self.request.uri))
 
-
 class PlayerHandler(webapp2.RequestHandler):
 	def get(self):
 		req_player_id = self.request.get('id', None)
@@ -53,7 +50,6 @@ class PlayerHandler(webapp2.RequestHandler):
 			self.response.write("<a href='/?menu=player'>success</a>")
 		else:
 			self.response.write("fail")
-
 
 class PlayGroundHandler(webapp2.RequestHandler):
 	def get(self):
@@ -66,9 +62,12 @@ class PlayGroundHandler(webapp2.RequestHandler):
 			self.response.write("fail")
 
 
-class TournamentPage(webapp2.RequestHandler):
+class TournamentHandler(webapp2.RequestHandler):
 	def get(self):
-		self.response.write(tournamentService.getTournamentJson())	
+		if self.request.get('withDetail', None) != None:
+			self.response.write(tournamentService.getTournamentWithFightJson())
+		else:
+			self.response.write(tournamentService.getTournamentJson())	
 		
 	def post(self):
 		if tournamentService.addTournament(self.request):
@@ -113,7 +112,7 @@ application = webapp2.WSGIApplication([
 	('/', MainPage),
 	('/player', PlayerHandler),
 	('/playground', PlayGroundHandler),
-	('/tournaments', TournamentPage),
+	('/tournaments', TournamentHandler),
 	('/fight', FightHandler),
 	('/fight/update', FightUpdateGroundHandler),
 	('/fight/toggleState', FightStateToggleHandler)
