@@ -16,40 +16,7 @@
 			</div>
 		</form>
 
-		<div>
-		{% for t in tournaments %}
-		<div class="border-round vertical-split">
-			<h3>{{t.tournament_name}} ({{t.tournament_level}}강)</h3>
-			<table class="table table-bordered table-striped tournament-table">
-			<tr>
-				<td colspan="4"><span class="label label-danger">결승</span></td>
-			</tr>
-			<tr>
-				<td colspan="4">아직...</td>
-			</tr>
-			<tr>
-				<td colspan="2"><span class="label label-info">준결승</span></td>
-				<td colspan="2"><span class="label label-info">준결승</span></td>
-			</tr>
-			<tr>
-				<td colspan="2">아직...</td>
-				<td colspan="2">아직...</td>
-			</tr>
-			<tr>
-				<td><span class="label label-inverse">8강</span></td>
-				<td><span class="label label-inverse">8강</span></td>
-				<td><span class="label label-inverse">8강</span></td>
-				<td><span class="label label-inverse">8강</span></td>
-			</tr>
-			<tr>
-				<td></td>
-				<td></td>
-				<td></td>
-				<td></td>
-			</tr>
-			</table>
-		</div>
-		{% endfor %}
+		<div id="tournament_view">
 		</div>
 	</div>
 
@@ -68,12 +35,65 @@
 		</div>
 	</div>
 </div>
+
+
+
+
 <script defer="defer">
 $(function(){
+	//경기장 설정 button handler
 	$(".btn-group button").click(function () {
 		$("#tournament_level").val($(this).text());
 	});
 
 	$(".btn-group button:first").click();
+	
+	$.getJSON('tournaments?withDetail=true', function(data){
+		console.log(data);
+		renderTournaments(data);
+	});
+
+	function renderTournaments(tournamentData){
+		for (idx in tournamentData) {
+			renderTournament(tournamentData[idx]);
+		}
+	}
+
+	function renderTournament(tournament){
+		var targetDiv = $("#tournament_view");
+		var fights = tournament.fights;
+		var markup = "<h1>"+tournament.tournament_name+"</h1><table class='table table-bordered table-striped tournament-table'>";
+		var rowCount = calcRowCount(tournament.tournament_level);
+		var tournamentLevel = Math.pow(2, rowCount);
+		for (i=0; i<rowCount; i++){
+			var colCount = Math.pow(2, i);
+			markup += "<tr>";
+			for (j=0; j<colCount; j++){
+				markup +="<td colspan='"+Math.pow(2,rowCount-(i+1))+"'>"+Math.pow(2,i+1)+"강</td>"
+			}
+			markup += "</tr>";
+			markup += "<tr>";
+			for (j=0; j<colCount; j++){
+				var fight = "";
+				if (i == rowCount-1 && j+1 in fights){
+					fight = fights[j+1];
+					fight = fight.player1.name + " vs " + fight.player2.name;
+				}
+				markup +="<td colspan='"+Math.pow(2,rowCount-(i+1))+"'>"+fight+"</td>"
+			}
+			markup += "</tr>";
+		}
+		markup += "</table>";
+		targetDiv.append($(markup));
+	}
+
+	function calcRowCount(tournament_level){
+			var rowCount = 0;
+			for (i=1; i<tournament_level; i*=2){
+				rowCount++;
+			}
+			return rowCount;
+	}
+	
 });
 </script>
