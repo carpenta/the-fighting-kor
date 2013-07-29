@@ -22,7 +22,7 @@ class PlayerService():
 	
 	def getPlayerJson(self, id):
 		players = []
-		for p in self.getPlayer(self, id):
+		for p in self.getPlayer(id):
 			players.append(dictWithKey(p))
 		return json.dumps(players)
 
