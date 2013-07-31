@@ -64,7 +64,7 @@
 					<input type="submit" class="btn btn-warning" value="변경" />
 				</form>
 			</td>
-			<td>{{f.winner.get().name}}</td>
+			<td>{% if f is defined %}{{f.winner.get().name}}{% endif %}</td>
 			<td>
 				<form method="POST" action="./fight/update?fight={{f.key.urlsafe()}}">
 				<div class="btn-group" data-toggle="buttons-radio">
