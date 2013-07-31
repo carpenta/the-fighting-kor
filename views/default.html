@@ -26,7 +26,11 @@
 			<table class="table table-striped table-bordered">
 				<thead>
 					<tr>
-						<th>토너먼트 이름</th><th>조번호</th><th>선수1</th><th>선수2</th>
+						<th>토너먼트 이름</th>
+						<th>조번호</th>
+						<th>선수1</th>
+						<th>선수2</th>
+						<th>승자선택</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -36,6 +40,16 @@
 					<td>{{f.tournament_num}}</td>
 					<td>{{f.player1.get().name}}</td>
 					<td>{{f.player2.get().name}}</td>
+					<td>
+						<form method="POST" class="form form-inline" action="fight/updateWinner">
+							<input type="hidden" name="fight_id" value="{{f.key.urlsafe()}}" />
+							<select name="winner" class="input-small">
+								<option value="{{f.player1.urlsafe()}}">{{f.player1.get().name}}</option>
+								<option value="{{f.player2.urlsafe()}}">{{f.player2.get().name}}</option>
+							</select>
+							<input type="submit" class="btn btn-waring" />
+						</form>
+					</td>
 				</tr>
 				{% endfor %}
 				</tbody>

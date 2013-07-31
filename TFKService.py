@@ -172,6 +172,15 @@ class FightService():
 		fight.put()
 		return True
 
+	def updateWinner(self, fight_id, winner):
+		if id is None or winner is None:
+			return False
+		fight = ndb.Key(urlsafe=fight_id).get()
+		fight.winner = ndb.Key(urlsafe=winner)
+		fight.status = "end"
+		fight.put()
+		return True
+
 	def toggleState(self, id):
 		if id is None:
 			return False

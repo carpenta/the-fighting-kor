@@ -101,6 +101,16 @@ class FightUpdateGroundHandler(webapp2.RequestHandler):
 		else:
 			self.response.write("fail")
 
+class FightUpdateWinnerHandler(webapp2.RequestHandler):
+	def post(self):
+		fight_id = self.request.get('fight_id', None)
+		winner = self.request.get('winner', None)
+
+		if fightService.updateWinner(fight_id, winner):
+			self.response.write("<a href='/'>success</a>")
+		else:
+			self.response.write("fail")
+
 class FightStateToggleHandler(webapp2.RequestHandler):
 	def post(self):
 		if fightService.toggleState(self.request.get('fight')):
@@ -115,5 +125,6 @@ application = webapp2.WSGIApplication([
 	('/tournaments', TournamentHandler),
 	('/fight', FightHandler),
 	('/fight/update', FightUpdateGroundHandler),
+	('/fight/updateWinner', FightUpdateWinnerHandler),
 	('/fight/toggleState', FightStateToggleHandler)
 ], debug=True)
