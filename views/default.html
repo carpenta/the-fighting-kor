@@ -38,8 +38,17 @@
 				<tr>
 					<td>{{f.tournament.get().tournament_name}}</td>
 					<td>{{f.tournament_num}}</td>
-					<td>{{f.player1.get().name}}</td>
-					<td>{{f.player2.get().name}}</td>
+					<td>
+					{% if f.player1 is not None %}
+						{{f.player1.get().name}}
+					{% endif %}
+					</td>
+					
+					<td>
+					{% if f.player2 is not None %}
+						{{f.player2.get().name}}
+					{% endif %}
+					</td>
 					<td>
 						<form method="POST" class="form form-inline" action="fight/updateWinner">
 							<input type="hidden" name="fight_id" value="{{f.key.urlsafe()}}" />
