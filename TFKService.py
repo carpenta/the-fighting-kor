@@ -80,13 +80,22 @@ class TournamentService():
 			fights = {} 
 			for f in Fight.query(Fight.tournament == t.key):
 				fight = dictWithKey(f)
-				print fight
 				del fight['tournament']
-				fight['player1'] = dictWithKey(f.player1.get())
-				fight['player2'] = dictWithKey(f.player2.get())
-				if f.winner != None:
+				if f.player1 is None:
+					tmpPlayer = Player()
+					tmpPlayer.name = "(wait ..)"
+					fight['player1'] = tmpPlayer.to_dict()
+				else:
+					fight['player1'] = dictWithKey(f.player1.get())
+				if f.player2 is None:
+					tmpPlayer = Player()
+					tmpPlayer.name = "(wait ..)"
+					fight['player2'] = tmpPlayer.to_dict()
+				else:
+					fight['player2'] = dictWithKey(f.player2.get())
+				if f.winner is not None:
 					fight['winner'] = dictWithKey(f.winner.get())
-				fights[f.tournament_num] = fight
+				fights["%s:%d"%(f.fight_level,f.tournament_num)] = fight
 
 			tournament['fights'] = fights
 			tournaments.append(tournament)
@@ -161,6 +170,7 @@ class FightService():
 		fight.player1 = ndb.Key(urlsafe=request.get('p1_id'))
 		fight.player2 = ndb.Key(urlsafe=request.get('p2_id'))
 		fight.status = "running"
+		fight.fight_level = fight.tournament.get().tournament_level
 		fight.put()
 		return True
 
@@ -172,6 +182,35 @@ class FightService():
 		fight.put()
 		return True
 
+	def updateNextFight(self, fight):
+		if fight is None:
+			return False
+		
+		# 이미 입력되어 있는 토너먼트 찾기
+		if fight.fight_level is None:
+			fight.fight_level = fight.tournament.get().tournament_level
+			fight.put()
+
+		fights = Fight.query(Fight.fight_level == fight.fight_level/2, 
+				Fight.tournament_num == self.nextNum(fight.tournament_num)).fetch()
+		nextFight = None
+		if len(fights) > 0:
+			nextFight = fights[0]
+		
+		if nextFight is None:
+			nextFight = Fight()
+			nextFight.tournament = fight.tournament
+			nextFight.tournament_num = self.nextNum(fight.tournament_num)
+			nextFight.status = "running"
+			nextFight.fight_level = fight.fight_level/2
+
+		if(self.isFirstPlayer(fight.tournament_num)):
+			nextFight.player1 = fight.winner
+		else:
+			nextFight.player2 = fight.winner
+		nextFight.put()
+		return True
+
 	def updateWinner(self, fight_id, winner):
 		if id is None or winner is None:
 			return False
@@ -179,6 +218,8 @@ class FightService():
 		fight.winner = ndb.Key(urlsafe=winner)
 		fight.status = "end"
 		fight.put()
+		
+		self.updateNextFight(fight)
 		return True
 
 	def toggleState(self, id):
@@ -192,3 +233,9 @@ class FightService():
 			fight.status = "running"
 		fight.put()
 		return True
+	
+	def nextNum(self, num):
+		return int((num+1) / 2.0)
+	
+	def isFirstPlayer(self, num):
+		return ((num+1) / 2.0) <= 1.0

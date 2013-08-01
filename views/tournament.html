@@ -49,7 +49,6 @@ $(function(){
 	$(".btn-group button:first").click();
 	
 	$.getJSON('tournaments?withDetail=true', function(data){
-		console.log(data);
 		renderTournaments(data);
 	});
 
@@ -62,24 +61,30 @@ $(function(){
 	function renderTournament(tournament){
 		var targetDiv = $("#tournament_view");
 		var fights = tournament.fights;
+		console.log(fights);
 		var markup = "<h1>"+tournament.tournament_name+"</h1><table class='table table-bordered table-striped tournament-table'>";
 		var rowCount = calcRowCount(tournament.tournament_level);
 		var tournamentLevel = Math.pow(2, rowCount);
 		for (i=0; i<rowCount; i++){
 			var colCount = Math.pow(2, i);
+			var tournament_level = Math.pow(2, i+1);
+			var colspan = Math.pow(2, rowCount - (i+1));
 			markup += "<tr>";
 			for (j=0; j<colCount; j++){
-				markup +="<td colspan='"+Math.pow(2,rowCount-(i+1))+"'>"+Math.pow(2,i+1)+"강</td>"
+				markup +="<td colspan='"+colspan+"'>"+tournament_level+"강</td>"
 			}
 			markup += "</tr>";
 			markup += "<tr>";
 			for (j=0; j<colCount; j++){
+				var fight_info = "";
 				var fight = "";
-				if (i == rowCount-1 && j+1 in fights){
-					fight = fights[j+1];
-					fight = fight.player1.name + " vs " + fight.player2.name;
+				fight = fights[tournament_level+":"+(j+1)];
+				if (fight == null) continue;
+				if('winner' in fight && fight.winner != null){
+					fight_info += "<span class='label label-warning'>승자: " + fight.winner.name+ "</span> ";
 				}
-				markup +="<td colspan='"+Math.pow(2,rowCount-(i+1))+"'>"+fight+"</td>"
+				fight_info += fight.player1.name + " vs " + fight.player2.name;
+				markup +="<td colspan='"+colspan+"'>"+fight_info+"</td>"
 			}
 			markup += "</tr>";
 		}
