@@ -183,7 +183,7 @@ class FightService():
 		return True
 
 	def updateNextFight(self, fight):
-		if fight is None:
+		if fight is None or fight.fight_level is None or fight.fight_level < 4:
 			return False
 		
 		# 이미 입력되어 있는 토너먼트 찾기
@@ -238,4 +238,4 @@ class FightService():
 		return int((num+1) / 2.0)
 	
 	def isFirstPlayer(self, num):
-		return ((num+1) / 2.0) <= 1.0
+		return (num % 2) != 0

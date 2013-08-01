@@ -27,6 +27,7 @@
 				<thead>
 					<tr>
 						<th>토너먼트 이름</th>
+						<th>토너먼트 단계</th>
 						<th>조번호</th>
 						<th>선수1</th>
 						<th>선수2</th>
@@ -37,19 +38,21 @@
 				{% for f in playground_fights[pg.playground_num] %}
 				<tr>
 					<td>{{f.tournament.get().tournament_name}}</td>
+					<td>{{f.fight_level}}</td>
 					<td>{{f.tournament_num}}</td>
 					<td>
-					{% if f.player1 is not None %}
+					{% if f.player1 != None %}
 						{{f.player1.get().name}}
 					{% endif %}
 					</td>
 					
 					<td>
-					{% if f.player2 is not None %}
+					{% if f.player2 != None %}
 						{{f.player2.get().name}}
 					{% endif %}
 					</td>
 					<td>
+					{% if f.player1 != None and f.player2 != None %}
 						<form method="POST" class="form form-inline" action="fight/updateWinner">
 							<input type="hidden" name="fight_id" value="{{f.key.urlsafe()}}" />
 							<select name="winner" class="input-small">
@@ -58,6 +61,7 @@
 							</select>
 							<input type="submit" class="btn btn-waring" />
 						</form>
+					{% endif %}
 					</td>
 				</tr>
 				{% endfor %}
