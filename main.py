@@ -64,7 +64,10 @@ class PlayGroundHandler(webapp2.RequestHandler):
 
 class TournamentHandler(webapp2.RequestHandler):
 	def get(self):
-		if self.request.get('withDetail', None) != None:
+		id = self.request.get('id',None)
+		if id != None:
+			self.response.write(tournamentService.getTournamentWithWinners(id))
+		elif self.request.get('withDetail', None) != None:
 			self.response.write(tournamentService.getTournamentWithFightJson())
 		else:
 			self.response.write(tournamentService.getTournamentJson())	

@@ -1,6 +1,5 @@
 indexes:
 - kind: Fight
-  ancestor: yes
   properties:
-  - name: tournament_num
-    direction: desc
+  - name: tournament
+  - name: fight_level

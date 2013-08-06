@@ -37,6 +37,13 @@ class PlayerService():
 		player.group = request.get('user_group', 'unknown')
 		player.put()
 		return True
+	
+	def removePlayer(self, id):
+		if id is None:
+			return False
+		player = ndb.Key(urlsafe=id).get()
+		player.delete()
+		return True
 
 
 class PlayGroundService():
@@ -71,6 +78,54 @@ class TournamentService():
 			tournament = dictWithKey(t)
 			tournaments.append(tournament)
 		return json.dumps(tournaments)
+	
+	def getTournamentWithWinners(self, id):
+		if id is None:
+			return False
+		
+		tournament = ndb.Key(urlsafe=id).get()
+		if tournament is None:
+			return False
+		
+		winner1 = None
+		winner2 = None
+		winner3 = None
+		winner4 = None
+
+		fight1 = Fight.query(Fight.tournament == tournament.key,
+					Fight.fight_level == 2).fetch(1)
+		fight2 = Fight.query(Fight.tournament == tournament.key,
+					Fight.fight_level == 4,
+					Fight.tournament_num == 1).fetch(1)
+		fight3 = Fight.query(Fight.tournament == tournament.key,
+					Fight.fight_level == 4,
+					Fight.tournament_num == 2).fetch(1)
+		if fight1 != None and len(fight1) > 0 and fight1[0] != None:
+			fight = fight1[0]
+			if fight.winner != None:
+				winner1 = fight.winner.get()
+				winner2 = fight.player1.get()
+				if fight.player1 == fight.winner:
+					winner2 = fight.player2.get()
+		if fight2 != None and len(fight2) > 0 and fight2[0] != None:
+			fight = fight2[0]
+			if fight.winner != None:
+				winner3 = fight.player1.get()
+				if fight.player1 == fight.winner:
+					winner3 = fight.player2.get()
+		if fight3 != None and len(fight3) > 0 and fight3[0] != None: 
+			fight = fight3[0]
+			if fight.winner != None:
+				winner4 = fight.player1.get()	
+				if fight.player1 == fight.winner:
+					winner4 = fight.player2.get()
+
+		result = dictWithKey(tournament)
+		result['winner1'] = dictWithKey(winner1)
+		result['winner2'] = dictWithKey(winner2)
+		result['winner3'] = dictWithKey(winner3)
+		result['winner4'] = dictWithKey(winner4)
+		return json.dumps(result)
 
 	def getTournamentWithFightJson(self):
 		tournaments = []
@@ -192,7 +247,7 @@ class FightService():
 			fight.put()
 
 		fights = Fight.query(Fight.fight_level == fight.fight_level/2, 
-				Fight.tournament_num == self.nextNum(fight.tournament_num)).fetch()
+				Fight.tournament_num == self.nextNum(fight.tournament_num)).fetch(1)
 		nextFight = None
 		if len(fights) > 0:
 			nextFight = fights[0]
