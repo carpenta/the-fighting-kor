@@ -12,7 +12,7 @@ class PlayerService():
 	def getPlayer(self, id):
 		players = []
 		if id is None:
-			players = Player.query()
+			players = Player.query().order(Player.name)
 		else:
 			players.append(ndb.Key(urlsafe=id).get())
 
@@ -116,7 +116,7 @@ class TournamentService():
 
 class FightService():
 	def getFights(self):
-		return Fight.query()
+		return Fight.query().order(Fight.tournament, Fight.fight_level)
 
 	def getFightJson(self, id):
 		if id is None:
