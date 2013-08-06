@@ -116,7 +116,7 @@ class TournamentService():
 
 class FightService():
 	def getFights(self):
-		return Fight.query().order(Fight.tournament, Fight.fight_level)
+		return Fight.query().order(Fight.tournament, Fight.fight_level, Fight.fight_level)
 
 	def getFightJson(self, id):
 		if id is None:
