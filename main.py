@@ -57,7 +57,7 @@ class PlayGroundHandler(webapp2.RequestHandler):
 
 	def post(self):
 		if playGroundService.addPlayGround(self.request):
-			self.response.write("<a href='/?menu=tournament'>success</a>")
+			self.redirect("/?menu=tournament")
 		else:
 			self.response.write("fail")
 
