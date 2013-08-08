@@ -16,6 +16,7 @@ class Player(ndb.Model):
 	group = ndb.StringProperty()
 	#operator = ndb.UserProperty()
 	#date = ndb.DateTimeProperty(auto_now_add=True)
+	isInfinite = ndb.BooleanProperty() #무제한급인지 아닌지 나타내는 필드
 
 class Tournament(ndb.Model):
 	tournament_name = ndb.StringProperty()

@@ -121,6 +121,36 @@ class FightStateToggleHandler(webapp2.RequestHandler):
 		else:
 			self.response.write("fail")
 
+class InitializeHandler(webapp2.RequestHandler):
+	def get(self):
+		f = open('players.csv', 'r')
+		line_count = 0
+		players = []
+		for line in f.xreadlines():
+			line_count+=1
+			if line_count == 1:
+				continue # 첫번째 줄은 버린다.(컬럼명이 나온 부분임)
+				
+			row = line.split(",")
+			#name = row[0]
+			#assoc = row[1]
+			#group = row[2]
+			#weight = row[3]
+			#grade = row[4]
+			#infinite = row[5]	
+			
+			player = Player(
+				name = str(row[0]), 
+				association = str(row[1]), 
+				weight = str(row[3]), 
+				grade = str(row[4]), 
+				group = str(row[2]), 
+				isInfinite = row[5]!="")
+			player.put()
+			players.append(player.to_dict())	
+		self.response.write(json.dumps(players))
+
+
 application = webapp2.WSGIApplication([
 	('/', MainPage),
 	('/player', PlayerHandler),
@@ -129,5 +159,6 @@ application = webapp2.WSGIApplication([
 	('/fight', FightHandler),
 	('/fight/update', FightUpdateGroundHandler),
 	('/fight/updateWinner', FightUpdateWinnerHandler),
-	('/fight/toggleState', FightStateToggleHandler)
+	('/fight/toggleState', FightStateToggleHandler),
+	('/init', InitializeHandler)
 ], debug=True)
