@@ -123,6 +123,9 @@ class FightStateToggleHandler(webapp2.RequestHandler):
 
 class InitializeHandler(webapp2.RequestHandler):
 	def get(self):
+		# delete all players
+		ndb.delete_multi([m.key for m in Player.query().fetch()])
+
 		f = open('players.csv', 'r')
 		line_count = 0
 		players = []
