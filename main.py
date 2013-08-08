@@ -133,10 +133,10 @@ class InitializeHandler(webapp2.RequestHandler):
 		# delete all tournaments
 		ndb.delete_multi([t.key for t in Tournament.query().fetch()])
 		self.response.write("<pre>")
+		
 		# insert players
 		f = open('players.csv', 'r')
 		line_count = 0
-		players = []
 		for line in f.xreadlines():
 			line_count+=1
 			if line_count == 1:
@@ -158,7 +158,6 @@ class InitializeHandler(webapp2.RequestHandler):
 				group = str(row[2]), 
 				isInfinite = row[5]!="")
 			player.put()
-			players.append(player.to_dict())	
 		self.response.write("%d 명의 선수를 입력했습니다\n"%(line_count-1))
 
 		# insert playgrounds
@@ -167,6 +166,24 @@ class InitializeHandler(webapp2.RequestHandler):
 			playground = PlayGround(playground_name=i)
 			playground.put()
 		self.response.write("%d 개의 경기장을 생성했습니다\n"%(len(ground_names)))
+		f.close()
+
+		# insert tournaments
+		f = open('tournaments.csv', 'r')
+		line_count = 0
+		for line in f.xreadlines():
+			line_count+=1
+			if line_count == 1:
+				continue # skip first line
+			print line		
+			row = line.split(',')
+			tournament = Tournament(
+				tournament_name = row[0],
+				tournament_level = int(row[1])
+			)
+			tournament.put()
+		f.close()
+		self.response.write("%d 개의 토너먼트를 입력했습니다\n"%(line_count-1))
 		self.response.write("</pre>")
 
 
