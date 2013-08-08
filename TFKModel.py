@@ -26,7 +26,7 @@ class Tournament(ndb.Model):
 class Fight(ndb.Model):
 	tournament = ndb.KeyProperty(kind=Tournament)
 	tournament_num = ndb.IntegerProperty() #몇번째 경기인지 번호로 지정
-	playground_num = ndb.IntegerProperty() #몇번 경기장에서 경기하고 있는지 지정
+	playground_name = ndb.StringProperty() #몇번 경기장에서 경기하고 있는지 지정
 	player1 = ndb.KeyProperty(kind=Player)
 	player2 = ndb.KeyProperty(kind=Player)
 	status = ndb.StringProperty() #running, end

@@ -166,8 +166,7 @@ class InitializeHandler(webapp2.RequestHandler):
 		for i in ground_names:
 			playground = PlayGround(playground_name=i)
 			playground.put()
-		self.response.write("%d 개의 경기장을 생성했습니다\n"%(len(ground_names))
-
+		self.response.write("%d 개의 경기장을 생성했습니다\n"%(len(ground_names)))
 		self.response.write("</pre>")
 
 

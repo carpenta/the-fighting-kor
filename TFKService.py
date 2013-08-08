@@ -48,7 +48,7 @@ class PlayerService():
 
 class PlayGroundService():
 	def getGrounds(self):
-		return PlayGround.query().order(PlayGround.playground_num).fetch()
+		return PlayGround.query().order(PlayGround.playground_name).fetch()
 
 	def getGroundsJson(self):
 		pgs = []
@@ -62,7 +62,7 @@ class PlayGroundService():
 			return False
 
 		playground = PlayGround()
-		playground.playground_num = int(request.get('playground_num'), 0)
+		playground.playground_name = int(request.get('playground_name'), 0)
 		playground.put()
 		return True
 		
@@ -190,14 +190,14 @@ class FightService():
 
 	def getFightKeyListJson(self, ground_num):
 		fights = []
-		for f in Fight.query(Fight.playground_num == ground_num).fetch():
+		for f in Fight.query(Fight.playground_name == ground_num).fetch():
 			fights.append(f.key.urlsafe())
 
 		return json.dumps(fights)
 
 	def getFightsJson(self, ground_num):
 		fights = []
-		for fight in Fight.query(Fight.playground_num == ground_num).fetch():
+		for fight in Fight.query(Fight.playground_name == ground_num).fetch():
 			fightdict = dictWithKey(fight)
 			fightdict['tournament'] = dictWithKey(fight.tournament.get())
 			fightdict['player1'] = dictWithKey(fight.player1.get())
@@ -211,7 +211,7 @@ class FightService():
 	def getGroundFightMap(self, playgrounds):
 		playground_fights = {}
 		for pg in playgrounds:
-			playground_fights[pg.playground_num] = Fight.query(Fight.playground_num == pg.playground_num, Fight.status == 'running').fetch()
+			playground_fights[pg.playground_name] = Fight.query(Fight.playground_name == pg.playground_name, Fight.status == 'running').fetch()
 		return playground_fights
 
 	def addFight(self, request):
@@ -221,7 +221,7 @@ class FightService():
 		fight = Fight()
 		fight.tournament = ndb.Key(urlsafe=request.get('tournament_id'))
 		fight.tournament_num = int(request.get('tournament_num'))
-		#fight.playground_num = self.request.get('playground_num')
+		#fight.playground_name = self.request.get('playground_name')
 		fight.player1 = ndb.Key(urlsafe=request.get('p1_id'))
 		fight.player2 = ndb.Key(urlsafe=request.get('p2_id'))
 		fight.status = "running"
@@ -229,11 +229,11 @@ class FightService():
 		fight.put()
 		return True
 
-	def updateFight(self, id, playground_num):
-		if id is None or playground_num is None:
+	def updateFight(self, id, playground_name):
+		if id is None or playground_name is None:
 			return False
 		fight = ndb.Key(urlsafe=id).get()
-		fight.playground_num = playground_num
+		fight.playground_name = playground_name
 		fight.put()
 		return True
 

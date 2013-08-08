@@ -67,7 +67,7 @@
 				{{f.player2.get().name}}
 			{% endif %}
 			</td>
-			<td>{{f.playground_num}}</td>
+			<td>{{f.playground_name}}</td>
 			<td>
 				{{f.status}}
 				<form method="POST" action="./fight/toggleState?fight={{f.key.urlsafe()}}">
@@ -79,10 +79,10 @@
 				<form method="POST" action="./fight/update?fight={{f.key.urlsafe()}}">
 				<div class="btn-group" data-toggle="buttons-radio">
 					{% for pg in playgrounds %}
-					<button type="button" class="btn">{{pg.playground_num}}</button>
+					<button type="button" class="btn">{{pg.playground_name}}</button>
 					{% endfor %}
 				</div>
-				<input type="hidden" id="playground_num_{{f.key.urlsafe()}}" name="playground_num" />
+				<input type="hidden" id="playground_name_{{f.key.urlsafe()}}" name="playground_name" />
 				<input type="submit" class="btn" value="저장" />
 				</form>
 			</td>
@@ -100,7 +100,7 @@
 $(function(){
 	$(".btn-group button").click(function () {
 		var k = $(this).closest('tr').attr("id");
-		$("#playground_num_"+k).val($(this).text());
+		$("#playground_name_"+k).val($(this).text());
 	});
 });
 </script>
