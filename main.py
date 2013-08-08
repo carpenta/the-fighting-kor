@@ -123,9 +123,17 @@ class FightStateToggleHandler(webapp2.RequestHandler):
 
 class InitializeHandler(webapp2.RequestHandler):
 	def get(self):
+		self.response.write("<h1>기존 데이터를 삭제합니다</h1>")
 		# delete all players
 		ndb.delete_multi([m.key for m in Player.query().fetch()])
-
+		# delete all playgrounds
+		ndb.delete_multi([g.key for g in PlayGround.query().fetch()])
+		# delete all fights
+		ndb.delete_multi([f.key for f in Fight.query().fetch()])
+		# delete all tournaments
+		ndb.delete_multi([t.key for t in Tournament.query().fetch()])
+		self.response.write("<pre>")
+		# insert players
 		f = open('players.csv', 'r')
 		line_count = 0
 		players = []
@@ -151,7 +159,16 @@ class InitializeHandler(webapp2.RequestHandler):
 				isInfinite = row[5]!="")
 			player.put()
 			players.append(player.to_dict())	
-		self.response.write(json.dumps(players))
+		self.response.write("%d 명의 선수를 입력했습니다\n"%(line_count-1))
+
+		# insert playgrounds
+		ground_names = ["A","B","C","D"]
+		for i in ground_names:
+			playground = PlayGround(playground_name=i)
+			playground.put()
+		self.response.write("%d 개의 경기장을 생성했습니다\n"%(len(ground_names))
+
+		self.response.write("</pre>")
 
 
 application = webapp2.WSGIApplication([

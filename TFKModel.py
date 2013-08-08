@@ -34,5 +34,5 @@ class Fight(ndb.Model):
 	fight_level = ndb.IntegerProperty() #토너먼트에서 몇강에 위치한 경기인지 표시 
 
 class PlayGround(ndb.Model):
-	playground_num = ndb.IntegerProperty()
+	playground_name = ndb.StringProperty()
 	fights = ndb.StructuredProperty(Fight, repeated=False)
