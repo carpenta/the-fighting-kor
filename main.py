@@ -137,10 +137,9 @@ class InitializeHandler(webapp2.RequestHandler):
 		# insert players
 		f = open('players.csv', 'r')
 		line_count = 0
+		players = {}
 		for line in f.xreadlines():
 			line_count+=1
-			if line_count == 1:
-				continue # 첫번째 줄은 버린다.(컬럼명이 나온 부분임)
 				
 			row = line.split(",")
 			#name = row[0]
@@ -158,7 +157,21 @@ class InitializeHandler(webapp2.RequestHandler):
 				group = str(row[2]), 
 				isInfinite = row[5]!="")
 			player.put()
-		self.response.write("%d 명의 선수를 입력했습니다\n"%(line_count-1))
+			players[player.name] = player
+		self.response.write("%d 명의 선수를 입력했습니다\n"%(line_count))
+
+		# 부전승 표시용 선수 입력
+		tmp_player = Player(
+			name = "부전승",
+			association = "",
+			weight = "0",
+			grade = "",
+			group = "",
+			isInfinite = False
+		)
+		tmp_player.put()
+		players[tmp_player.name] = tmp_player
+
 
 		# insert playgrounds
 		ground_names = ["A","B","C","D"]
@@ -171,22 +184,53 @@ class InitializeHandler(webapp2.RequestHandler):
 		# insert tournaments
 		f = open('tournaments.csv', 'r')
 		line_count = 0
+		tournaments ={} 
 		for line in f.xreadlines():
 			line_count+=1
-			if line_count == 1:
-				continue # skip first line
-			print line		
 			row = line.split(',')
 			tournament = Tournament(
-				tournament_name = row[0],
+				tournament_name = str(row[0]),
 				tournament_level = int(row[1])
 			)
 			tournament.put()
+			tournaments[tournament.tournament_name] = tournament
 		f.close()
-		self.response.write("%d 개의 토너먼트를 입력했습니다\n"%(line_count-1))
+		self.response.write("%d 개의 토너먼트를 입력했습니다\n"%(line_count))
+
+		#insert fights
+		f = open('fights.csv', 'r')
+		line_count = 0
+		for line in f.xreadlines():
+			line_count+=1
+			row = line.split(',')
+			if tournaments.has_key(row[0].decode('utf-8')):
+				_tournament = tournaments[row[0].decode('utf-8')]
+			else:
+				continue
+			if players.has_key(row[2].split('/')[0].decode('utf-8')):
+				_player1 = players[row[2].split('/')[0].decode('utf-8')]
+			else:
+				continue
+			if players.has_key(row[3].split('/')[0].decode('utf-8')):
+				_player2 = players[row[3].split('/')[0].decode('utf-8')]
+			else:
+				continue
+			fight = Fight(
+				tournament = _tournament.key,
+				tournament_num = int(row[1]),
+				player1 = _player1.key,
+				player2 = _player2.key,
+				status = 'running',
+				fight_level = _tournament.tournament_level
+			)	
+			fight.put()
+			
+			if _player2.name == "부전승":
+				fightService.updateWinner(fight.key.urlsafe(), _player1.key.urlsafe())
+		f.close()
+		self.response.write("%d 개의 경기를 입력했습니다\n"%(line_count))
 		self.response.write("</pre>")
-
-
+		
 application = webapp2.WSGIApplication([
 	('/', MainPage),
 	('/player', PlayerHandler),

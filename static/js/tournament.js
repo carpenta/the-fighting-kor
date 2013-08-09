@@ -1,4 +1,5 @@
 function renderTournaments(tournamentData){
+	console.log(tournamentData);
 	for (idx in tournamentData) {
 		renderTournament(tournamentData[idx]);
 	}
