@@ -36,3 +36,4 @@ class Fight(ndb.Model):
 class PlayGround(ndb.Model):
 	playground_name = ndb.StringProperty()
 	fights = ndb.StructuredProperty(Fight, repeated=False)
+	playground_id=ndb.StringProperty()

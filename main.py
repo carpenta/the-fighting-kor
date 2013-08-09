@@ -84,7 +84,7 @@ class FightHandler(webapp2.RequestHandler):
 		ground = self.request.get('ground', None)
 		gid = self.request.get('gid', None)
 		if ground is not None:
-			self.response.write(fightService.getFightsJson(int(ground)))
+			self.response.write(fightService.getFightsJson(ground))
 		elif gid is not None:
 			self.response.write(fightService.getFightJson(gid))
 		else:
