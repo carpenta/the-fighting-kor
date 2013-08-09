@@ -225,7 +225,7 @@ class InitializeHandler(webapp2.RequestHandler):
 			)	
 			fight.put()
 			
-			if _player2.name == "부전승":
+			if _player2.name == tmp_player.name:
 				fightService.updateWinner(fight.key.urlsafe(), _player1.key.urlsafe())
 		f.close()
 		self.response.write("%d 개의 경기를 입력했습니다\n"%(line_count))
