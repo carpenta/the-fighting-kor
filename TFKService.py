@@ -246,7 +246,9 @@ class FightService():
 			fight.fight_level = fight.tournament.get().tournament_level
 			fight.put()
 
-		fights = Fight.query(Fight.fight_level == fight.fight_level/2, 
+		fights = Fight.query(
+				Fight.tournament == fight.tournament,
+				Fight.fight_level == fight.fight_level/2, 
 				Fight.tournament_num == self.nextNum(fight.tournament_num)).fetch(1)
 		nextFight = None
 		if len(fights) > 0:
