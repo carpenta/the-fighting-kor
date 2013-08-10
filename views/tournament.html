@@ -1,5 +1,21 @@
 <div class="row">
-	<div class="span6">
+	<div class="span12">	
+		<h1>경기장 관리</h1>		
+		<form method="POST" class="well form-inline" action="./playground">
+			<input type="text" name="playground_name" placeholder="경기장이름" />
+			<input type="submit" class="btn btn-warning" value="생성" />
+		</form>
+
+		<div class="well">
+			<h3>생성된 경기장</h3>
+			<div id="playgrounds">
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row">
+	<div class="span12">
 		<h1>토너먼트 관리</h1>
 		
 		<form class="well form-inline" method="POST" action="./tournaments">
@@ -19,22 +35,7 @@
 		<div id="tournament_view">
 		</div>
 	</div>
-
-	<div class="span6">	
-		<h1>경기장 관리</h1>		
-		<form method="POST" class="well form-inline" action="./playground">
-			<input type="text" name="playground_num" placeholder="경기장번호" />
-			<input type="submit" class="btn btn-warning" value="생성" />
-		</form>
-
-		<div class="well">
-			<h3>생성된 경기장</h3>
-			<div id="playgrounds">
-			</div>
-		</div>
-	</div>
 </div>
-
 
 <script src="static/js/tournament.js" defer="defer"></script>
 <script src="static/js/playground.js" defer="defer"></script>

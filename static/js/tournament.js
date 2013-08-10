@@ -1,4 +1,5 @@
 function renderTournaments(tournamentData){
+	console.log(tournamentData);
 	for (idx in tournamentData) {
 		renderTournament(tournamentData[idx]);
 	}
@@ -24,11 +25,12 @@ function renderTournament(tournament){
 			var fight_info = "";
 			var fight = "";
 			fight = fights[tournament_level+":"+(j+1)];
-			if (fight == null) continue;
-			if('winner' in fight && fight.winner != null){
-				fight_info += "<span class='label label-warning'>승자: " + fight.winner.name+ "</span><br/> ";
+			if (fight != null) {
+				if('winner' in fight && fight.winner != null){
+					fight_info += "<span class='label label-warning'>승자: " + fight.winner.name+ "</span><br/> ";
+				}
+				fight_info += fight.player1.name + "<br/>vs<br/>" + fight.player2.name;
 			}
-			fight_info += fight.player1.name + "<br/>vs<br/>" + fight.player2.name;
 			markup +="<td colspan='"+colspan+"'>"+fight_info+"</td>"
 		}
 		markup += "</tr>";
