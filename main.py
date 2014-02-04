@@ -84,7 +84,7 @@ class FightHandler(webapp2.RequestHandler):
 		ground = self.request.get('ground', None)
 		gid = self.request.get('gid', None)
 		if ground is not None:
-			self.response.write(fightService.getFightsJson(int(ground)))
+			self.response.write(fightService.getFightsJson(ground))
 		elif gid is not None:
 			self.response.write(fightService.getFightJson(gid))
 		else:
@@ -99,7 +99,7 @@ class FightHandler(webapp2.RequestHandler):
 
 class FightUpdateGroundHandler(webapp2.RequestHandler):
 	def post(self):
-		if fightService.updateFight(self.request.get('fight'), int(self.request.get('playground_num'))):
+		if fightService.updateFight(self.request.get('fight'), self.request.get('playground_name')):
 			self.response.write("<a href='/?menu=ground'>success</a>")
 		else:
 			self.response.write("fail")
